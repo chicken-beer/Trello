@@ -55,7 +55,7 @@ public class BoardService {
         return "게시물 삭제 완료";
     }
 
-    public String inviteUser(Long boardId, Long userId) {
+    public void inviteUser(Long boardId, Long userId) {
 
     }
 }
