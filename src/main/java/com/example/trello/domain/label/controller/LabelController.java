@@ -27,7 +27,7 @@ public class LabelController {
 	}
 
 	@PatchMapping( "/{labelId}" )
-	public ResponseEntity< String > modify_label( @PathVariable long labelId, LabelRequestDto labelRequestDto ) {
+	public ResponseEntity< String > modify_label( @PathVariable long labelId, @RequestBody LabelRequestDto labelRequestDto ) {
 		labelService.modify_label( labelId, labelRequestDto );
 		return ResponseEntity.ok( "modify success" );
 	}

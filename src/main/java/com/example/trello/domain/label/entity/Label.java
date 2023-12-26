@@ -7,7 +7,6 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table( name = "Label" )
 public class Label {
 
 	@Id
