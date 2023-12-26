@@ -1,11 +1,11 @@
 package com.example.trello.domain.label.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @Table( name = "Label" )
 public class Label {
@@ -15,4 +15,10 @@ public class Label {
 	private long id;
 	private String name;
 	private String color;
+
+	@Builder
+	public Label( String name, String color ) {
+		this.name = name;
+		this.color = color;
+	}
 }

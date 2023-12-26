@@ -22,16 +22,19 @@ public class LabelController {
 
 	@PostMapping
 	public ResponseEntity< String > add_label( LabelRequestDto labelRequestDto ) {
+		labelService.add_label( labelRequestDto );
 		return ResponseEntity.ok( "add success" );
 	}
 
 	@PatchMapping( "/{labelId}" )
 	public ResponseEntity< String > modify_label( @PathVariable long labelId, LabelRequestDto labelRequestDto ) {
+		labelService.modify_label( labelId, labelRequestDto );
 		return ResponseEntity.ok( "modify success" );
 	}
 
 	@DeleteMapping( "/{labelId}" )
 	public ResponseEntity< String > delete_label( @PathVariable long labelId ) {
+		labelService.delete_label( labelId );
 		return ResponseEntity.ok( "delete success" );
 	}
 }
