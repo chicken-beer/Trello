@@ -1,4 +1,7 @@
 package com.example.trello.domain.label.repository;
 
-public class LabelRepository {
+import com.example.trello.domain.label.entity.Label;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface LabelRepository extends JpaRepository< Label, Long > {
 }
