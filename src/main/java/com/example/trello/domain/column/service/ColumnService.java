@@ -26,16 +26,37 @@ public class ColumnService {
     public void postColumn(Long boardId, ColumnRequestDto requestDto) {
         Board board = checkBoardId(boardId);
 
-        Columns columns = new Columns(board,requestDto);
+        Integer lastColumnOrder=0;
+        Columns lastColumn = columnRepository.findTopByOrderByColumnOrderDesc().orElse(null);
+        if (lastColumn==null) {
+            lastColumnOrder=0;
+        } else {
+            lastColumnOrder = lastColumn.getColumnOrder();
+        }
+
+        Columns columns = new Columns(board,requestDto, lastColumnOrder);
         columnRepository.save(columns);
     }
 
     @Transactional
-    public void updateColumn(Long boardId, Long columnId, ColumnRequestDto requestDto) {
+    public void updateColumnName(Long boardId, Long columnId, ColumnRequestDto requestDto) {
         checkBoardId(boardId);
         Columns columns = checkColumnId(columnId);
 
-        columns.update(requestDto);
+        columns.updateName(requestDto);
+    }
+
+    @Transactional
+    public void updateColumnOrder(Long boardId, Long columnId1, Long columnId2) {
+        checkBoardId(boardId);
+        Columns column1 = checkColumnId(columnId1);
+        Columns column2 = checkColumnId(columnId2);
+
+        Integer column1ColumnOrder = column1.getColumnOrder();
+        Integer column2ColumnOrder = column2.getColumnOrder();
+
+        column1.updateColumnOder(column2ColumnOrder);
+        column2.updateColumnOder(column1ColumnOrder);
     }
 
     @Transactional
@@ -60,7 +81,7 @@ public class ColumnService {
         Board board = checkBoardId(boardId);
 
         List<ColumnResponseDto> columnResponseDtoList = new ArrayList<>();
-        columnRepository.findAllByBoard(board).stream().forEach(a -> {
+        columnRepository.findAllByBoardOrderByColumnOrder(board).stream().forEach(a -> {
             columnResponseDtoList.add(new ColumnResponseDto(
                     a.getName(),
                     cardRepository.findAllByColumns_Id(a.getId()).stream().map(CardResponseDto::new).toList()

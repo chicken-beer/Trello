@@ -22,21 +22,28 @@ public class Columns {
 
     private Boolean isArchived;
 
+    private Integer columnOrder;
+
     @ManyToOne
     @JoinColumn(name = "board_id")
     private Board board;
 
-    public Columns(Board board, ColumnRequestDto requestDto) {
+    public Columns(Board board, ColumnRequestDto requestDto, Integer columnOrder) {
         this.board = board;
         this.name = requestDto.getName();
         isArchived=false;
+        this.columnOrder = columnOrder+1;
     }
 
-    public void update(ColumnRequestDto requestDto) {
+    public void updateName(ColumnRequestDto requestDto) {
         this.name = requestDto.getName();
     }
 
     public void delete() {
         this.isArchived = true;
+    }
+
+    public void updateColumnOder(Integer column2ColumnOrder) {
+        this.columnOrder = column2ColumnOrder;
     }
 }

@@ -25,11 +25,19 @@ public class ColumnController {
     }
 
     @PatchMapping("/{columnId}")
-    public ResponseEntity<CommonResponseDto> updateColumn(@PathVariable Long boardId,
-                                                          @PathVariable Long columnId,
-                                                          @RequestBody ColumnRequestDto requestDto) {
-        columnService.updateColumn(boardId,columnId,requestDto);
-        return ResponseEntity.ok().body(new CommonResponseDto("컬럼 수정 성공", HttpStatus.OK.value()));
+    public ResponseEntity<CommonResponseDto> updateColumnName(@PathVariable Long boardId,
+                                                              @PathVariable Long columnId,
+                                                              @RequestBody ColumnRequestDto requestDto) {
+        columnService.updateColumnName(boardId,columnId,requestDto);
+        return ResponseEntity.ok().body(new CommonResponseDto("컬럼 이름 수정 성공", HttpStatus.OK.value()));
+    }
+
+    @PatchMapping("/swap-order/{columnId1}/{columnId2}")
+    public ResponseEntity<CommonResponseDto> updateColumnOrder(@PathVariable Long boardId,
+                                                               @PathVariable Long columnId1,
+                                                               @PathVariable Long columnId2) {
+        columnService.updateColumnOrder(boardId,columnId1,columnId2);
+        return ResponseEntity.ok().body(new CommonResponseDto("컬럼 순서 수정 성공", HttpStatus.OK.value()));
     }
 
     @DeleteMapping("/{columnId}")
