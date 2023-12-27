@@ -1,6 +1,7 @@
 package com.example.trello.domain.checklist.service;
 
 import com.example.trello.domain.checklist.dto.ChecklistItemRequestDto;
+import com.example.trello.domain.checklist.dto.ChecklistItemResponseDto;
 import com.example.trello.domain.checklist.dto.ChecklistRequestDto;
 import com.example.trello.domain.checklist.dto.ChecklistResponseDto;
 import com.example.trello.domain.checklist.entity.ChecklistItem;
@@ -36,9 +37,19 @@ public class ChecklistService {
 	}
 
 	public List< ChecklistResponseDto > get_checklist() {
-		return checklistRepository.findAll().stream().map( c -> ChecklistResponseDto.builder()
-				.title( c.getTitle() )
-				.build() ).toList();
+		return checklistRepository.findAll().stream().map( list -> ChecklistResponseDto.builder()
+				.title( list.getTitle() )
+				.items(
+						checklistItemRepository.findAllByChecklistId( list.getId() )
+								.stream().map( item -> ChecklistItemResponseDto.builder()
+										.title( item.getTitle() )
+										.isChecked( item.isChecked() )
+										.dueDate( item.getDueDate() )
+										.build()
+								).toList()
+				)
+				.build()
+		).toList();
 	}
 
 	@Transactional
@@ -50,11 +61,16 @@ public class ChecklistService {
 		item.setTitle( checklistRequestDto.getTitle() );
 	}
 
-	public void add_item( ChecklistItemRequestDto checklistItemRequestDto ) {
+	public void add_item( long checklistId, ChecklistItemRequestDto checklistItemRequestDto ) {
+		var checklist = checklistRepository.findById( checklistId ).orElseThrow(
+				() -> new NoSuchElementException( "해당 checklist가 존재하지 않습니다. ID : " + checklistId )
+		);
+
 		checklistItemRepository.save( ChecklistItem.builder()
 				.title( checklistItemRequestDto.getTitle() )
 				.due_date( checklistItemRequestDto.getDueDate() )
-				.is_checked( false )
+				.isChecked( false )
+				.checklist( checklist )
 				.build()
 		);
 	}
@@ -73,12 +89,13 @@ public class ChecklistService {
 	@Transactional
 	public void add_modify_item_due_date( long checklistId, long itemId, ChecklistItemRequestDto checklistItemRequestDto ) {
 		var item = check_ids( checklistId, itemId );
-		item.setDue_date( checklistItemRequestDto.getDueDate() );
+		item.setDueDate( checklistItemRequestDto.getDueDate() );
 	}
 
-	public void delete_item_due_date( long checklistId, long itemId, ChecklistItemRequestDto checklistItemRequestDto ) {
-		check_ids( checklistId, itemId );
-		checklistItemRepository.deleteById( itemId );
+	@Transactional
+	public void delete_item_due_date( long checklistId, long itemId ) {
+		var item = check_ids( checklistId, itemId );
+		item.setDueDate( null );
 	}
 
 	@Transactional
@@ -106,6 +123,6 @@ public class ChecklistService {
 	@Transactional
 	public void checked_item( long checklistId, long itemId, ChecklistItemRequestDto checklistItemRequestDto ) {
 		var item = check_ids( checklistId, itemId );
-		item.set_checked( checklistItemRequestDto.is_checked() );
+		item.setChecked( checklistItemRequestDto.getIsChecked() );
 	}
 }

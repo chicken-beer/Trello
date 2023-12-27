@@ -1,13 +1,14 @@
 package com.example.trello.domain.checklist.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
-public class ChecklistItemRequestDto {
+@Builder
+public class ChecklistItemResponseDto {
 	private String title;
 	private LocalDateTime dueDate;
 	private Boolean isChecked;
-	private long userId;
 }

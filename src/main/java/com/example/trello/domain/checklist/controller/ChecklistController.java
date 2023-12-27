@@ -24,8 +24,10 @@ public class ChecklistController {
 	}
 
 	@PostMapping( "/{checklistId}/items" )
-	public ResponseEntity< ApiResponse > add_item( ChecklistItemRequestDto checklistItemRequestDto ) {
-		checklistService.add_item( checklistItemRequestDto );
+	public ResponseEntity< ApiResponse > add_item(
+			@PathVariable long checklistId,
+			@RequestBody ChecklistItemRequestDto checklistItemRequestDto ) {
+		checklistService.add_item( checklistId, checklistItemRequestDto );
 		return ResponseEntity.ok( ApiResponse.ok( "add item success" ) );
 	}
 
@@ -46,8 +48,7 @@ public class ChecklistController {
 	}
 
 	@PostMapping( "/{checklistId}/items/{itemId}/duedate" )
-	@PatchMapping( "/{checklistId}/items/{itemId}/duedate" )
-	public ResponseEntity< ApiResponse > add_modify_item_due_date(
+	public ResponseEntity< ApiResponse > add_item_due_date(
 			@PathVariable long checklistId,
 			@PathVariable long itemId,
 			@RequestBody ChecklistItemRequestDto checklistItemRequestDto )
@@ -56,13 +57,23 @@ public class ChecklistController {
 		return ResponseEntity.ok( ApiResponse.ok( "add item due date success" ) );
 	}
 
-	@DeleteMapping( "/{checklistId}/items/{itemId}/duedate" )
-	public ResponseEntity< ApiResponse > delete_item_due_date(
+	@PatchMapping( "/{checklistId}/items/{itemId}/duedate" )
+	public ResponseEntity< ApiResponse > modify_item_due_date(
 			@PathVariable long checklistId,
 			@PathVariable long itemId,
 			@RequestBody ChecklistItemRequestDto checklistItemRequestDto )
 	{
-		checklistService.delete_item_due_date( checklistId, itemId, checklistItemRequestDto );
+		checklistService.add_modify_item_due_date( checklistId, itemId, checklistItemRequestDto );
+		return ResponseEntity.ok( ApiResponse.ok( "modify item due date success" ) );
+	}
+
+
+	@DeleteMapping( "/{checklistId}/items/{itemId}/duedate" )
+	public ResponseEntity< ApiResponse > delete_item_due_date(
+			@PathVariable long checklistId,
+			@PathVariable long itemId )
+	{
+		checklistService.delete_item_due_date( checklistId, itemId );
 		return ResponseEntity.ok( ApiResponse.ok( "delete item due date success" ) );
 	}
 

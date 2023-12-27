@@ -2,30 +2,32 @@ package com.example.trello.domain.checklist.entity;
 
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Setter
+@Getter
 @NoArgsConstructor
 public class ChecklistItem {
 	@Id
 	@GeneratedValue( strategy = GenerationType.IDENTITY )
 	private long id;
 	private String title;
-	private LocalDateTime due_date;
-	private boolean is_checked;
+	private LocalDateTime dueDate;
+	private boolean isChecked;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Checklist checklist;
 
 	@Builder
-	public ChecklistItem( String title, LocalDateTime due_date, boolean is_checked ) {
+	public ChecklistItem( String title, LocalDateTime due_date, boolean isChecked, Checklist checklist ) {
 		this.title = title;
-		this.due_date = due_date;
-		this.is_checked = is_checked;
+		this.dueDate = due_date;
+		this.isChecked = isChecked;
+		this.checklist = checklist;
 	}
 }

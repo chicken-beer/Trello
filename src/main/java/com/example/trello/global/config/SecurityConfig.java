@@ -61,6 +61,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/v1/auth/**").permitAll()
+                .requestMatchers( "/v1/**" ).permitAll()
                 .anyRequest().authenticated()
         );
 
