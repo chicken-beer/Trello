@@ -31,4 +31,8 @@ public class Columns {
     public void update(UpdateColumnRequestDto requestDto) {
         this.name = requestDto.getName();
     }
+
+    public void delete() {
+        this.isArchived = true;
+    }
 }

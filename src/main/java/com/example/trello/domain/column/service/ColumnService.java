@@ -37,12 +37,12 @@ public class ColumnService {
         columns.update(requestDto);
     }
 
-
+    @Transactional
     public void deleteColumn(Long boardId, Long columnId) {
         checkBoardId(boardId);
         Columns columns = checkColumnIdAndReturnColumn(columnId);
 
-        columnRepository.delete(columns);
+        columns.delete();
     }
 
     public ColumnResponseDto getColumn(Long boardId, Long columnId) {
