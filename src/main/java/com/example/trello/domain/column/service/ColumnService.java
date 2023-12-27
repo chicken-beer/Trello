@@ -26,12 +26,9 @@ public class ColumnService {
     public void postColumn(Long boardId, ColumnRequestDto requestDto) {
         Board board = checkBoardId(boardId);
 
-        Integer lastColumnOrder=0;
-        Columns lastColumn = columnRepository.findTopByOrderByColumnOrderDesc().orElse(null);
-        if (lastColumn==null) {
+        Integer lastColumnOrder = columnRepository.findMaxColumnOrderByBoard(board);
+        if (lastColumnOrder==null) {
             lastColumnOrder=0;
-        } else {
-            lastColumnOrder = lastColumn.getColumnOrder();
         }
 
         Columns columns = new Columns(board,requestDto, lastColumnOrder);
