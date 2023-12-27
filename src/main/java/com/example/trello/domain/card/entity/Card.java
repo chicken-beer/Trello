@@ -2,6 +2,7 @@ package com.example.trello.domain.card.entity;
 
 import com.example.trello.domain.card.dto.CardRequestDto;
 import com.example.trello.domain.card.dto.CardTitleUpdateRequestDto;
+import com.example.trello.domain.column.entity.Columns;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,6 @@ public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
     private String title;
     private String description;
     private String coverImg;
@@ -28,19 +28,19 @@ public class Card {
     private Boolean isArchived;
 
     // 생성자 - 약속된 형태로만 생성가능하도록 합니다.
-    public Card(CardRequestDto requestDto, Column column) {
+    public Card(CardRequestDto requestDto, Columns columns) {
         this.title = requestDto.getTitle();
         this.description = requestDto.getDescription();
         this.coverImg = requestDto.getCoverImg();
         this.dueDate = requestDto.getDueDate();
         this.isArchived = requestDto.getIsArchived();
-        this.column = column;
+        this.columns = columns;
     }
 
     // 연관관계 - Foreign Key 값을 따로 컬럼으로 정의하지 않고 연관 관계로 정의합니다.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "column_id")
-    private Column column;
+    private Columns columns;
 
     // 연관관계 편의 메소드 - 반대쪽에는 연관관계 편의 메소드가 없도록 주의합니다.
 
