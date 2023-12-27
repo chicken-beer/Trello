@@ -64,11 +64,10 @@ public class JwtUtil {
 						.compact();
 	}
 
-	public boolean validateToken(String token) {
+	public Claims getUserInfoFromToken(String token) {
 		try {
-			Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-			return true;
-		}catch (SecurityException | MalformedJwtException e) {
+			return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+		} catch (SecurityException | MalformedJwtException e) {
 			throw new CustomException(HttpStatus.BAD_REQUEST, "Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
 		} catch (UnsupportedJwtException e) {
 			throw new CustomException(HttpStatus.BAD_REQUEST, "Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
@@ -76,9 +75,4 @@ public class JwtUtil {
 			throw new CustomException(HttpStatus.BAD_REQUEST, "JWT claims is empty, 잘못된 JWT 토큰 입니다.");
 		}
 	}
-
-	public Claims getUserInfoFromToken(String token) {
-		return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
-	}
-
 }
