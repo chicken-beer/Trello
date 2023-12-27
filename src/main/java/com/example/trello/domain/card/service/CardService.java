@@ -10,7 +10,7 @@ import com.example.trello.domain.card.repository.CardRepository;
 import com.example.trello.domain.column.entity.Columns;
 import com.example.trello.domain.column.repository.ColumnRepository;
 import com.example.trello.domain.user.entity.User;
-import com.example.trello.global.CommonResponseDto;
+import com.example.trello.global.response.CommonResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
