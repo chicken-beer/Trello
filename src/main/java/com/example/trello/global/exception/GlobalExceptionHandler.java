@@ -44,4 +44,11 @@ public class GlobalExceptionHandler {
 
 		return ResponseEntity.status( hs ).body( ApiResponse.fail( errorResponse ) );
 	}
+
+	@ExceptionHandler
+	public ResponseEntity handlerCustomException(CustomException ex) {
+		HttpStatus hs = ex.getStatus();
+		final ErrorResponse errorResponse = ErrorResponse.create( ex, hs, ex.getMessage() );
+		return ResponseEntity.status( hs ).body( ApiResponse.fail( errorResponse ) );
+	}
 }

@@ -1,13 +1,12 @@
 package com.example.trello.domain.boardUsers;
 
 import com.example.trello.domain.board.Board;
-import com.example.trello.domain.user.User;
+import com.example.trello.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ManyToAny;
 
 @Entity
 @Getter
