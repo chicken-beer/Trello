@@ -30,6 +30,5 @@ public class Columns {
 
     public void update(UpdateColumnRequestDto requestDto) {
         this.name = requestDto.getName();
-        this.isArchived = requestDto.getIsArchived();
     }
 }
