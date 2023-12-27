@@ -1,10 +1,15 @@
 package com.example.trello.domain.card.service;
 
+import com.example.trello.domain.board.Board;
+import com.example.trello.domain.board.BoardRepository;
 import com.example.trello.domain.card.dto.CardRequestDto;
 import com.example.trello.domain.card.dto.CardResponseDto;
 import com.example.trello.domain.card.dto.CardTitleUpdateRequestDto;
 import com.example.trello.domain.card.entity.Card;
 import com.example.trello.domain.card.repository.CardRepository;
+import com.example.trello.domain.column.entity.Columns;
+import com.example.trello.domain.column.repository.ColumnRepository;
+import com.example.trello.domain.user.entity.User;
 import com.example.trello.global.CommonResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,10 +30,10 @@ public class CardService {
     public CommonResponseDto postCard(Long boardId, Long columnId, CardRequestDto requestDto, User user) {
         Board board = boardRepository.findById(boardId).orElseThrow(() ->
                 new NoSuchElementException("해당 보드를 찾을 수 없습니다. ID: " + boardId));
-        Column column = columnRepository.findById(columnId).orElseThrow(() ->
+        Columns columns = columnRepository.findById(columnId).orElseThrow(() ->
                 new NoSuchElementException("해당 컬럼을 찾을 수 없습니다. ID: " + columnId));
 
-        Card card = new Card(requestDto, column);
+        Card card = new Card(requestDto, columns);
         cardRepository.save(card);
 
         return new CommonResponseDto("카드 생성 성공", HttpStatus.CREATED.value());
