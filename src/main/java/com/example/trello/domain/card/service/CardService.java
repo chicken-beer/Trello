@@ -1,10 +1,14 @@
 package com.example.trello.domain.card.service;
 
+import com.example.trello.domain.board.Board;
+import com.example.trello.domain.board.BoardRepository;
 import com.example.trello.domain.card.dto.CardRequestDto;
 import com.example.trello.domain.card.dto.CardResponseDto;
 import com.example.trello.domain.card.dto.CardTitleUpdateRequestDto;
 import com.example.trello.domain.card.entity.Card;
 import com.example.trello.domain.card.repository.CardRepository;
+
+import com.example.trello.domain.user.entity.User;
 import com.example.trello.global.CommonResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
