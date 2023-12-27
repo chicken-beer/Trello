@@ -49,9 +49,4 @@ public class Card {
     public void updateCardTitle(CardTitleUpdateRequestDto requestDto) {
         this.title = requestDto.getTitle();
     }
-
-
-
-
-
 }

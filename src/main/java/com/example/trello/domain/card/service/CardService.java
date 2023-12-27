@@ -53,6 +53,7 @@ public class CardService {
         return new CommonResponseDto("카드 제목 수정 성공", HttpStatus.OK.value());
     }
 
+    @Transactional
     public CommonResponseDto toggleIsArchived(Long boardId, Long columnId, Long cardId, User user) {
         findBoardAndColumnByIds(boardId, columnId);
         Card card = cardRepository.findById(cardId).orElseThrow(() ->

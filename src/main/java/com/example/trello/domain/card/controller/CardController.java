@@ -6,7 +6,6 @@ import com.example.trello.domain.card.dto.CardTitleUpdateRequestDto;
 import com.example.trello.domain.card.service.CardService;
 import com.example.trello.global.CommonResponseDto;
 import jakarta.validation.Valid;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -84,6 +83,6 @@ public class CardController {
     ) {
         CommonResponseDto responseDto = cardService.deleteCard(boardId, columnId, cardId, userDetails.getUser());
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(responseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 }
