@@ -1,4 +1,4 @@
-package com.example.trello.domain.boardUsers;
+package com.example.trello.domain.boardUsers.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
