@@ -2,6 +2,7 @@ package com.example.trello.domain.card.service;
 
 import com.example.trello.domain.board.Board;
 import com.example.trello.domain.board.BoardRepository;
+import com.example.trello.domain.card.dto.CardDueDateUpdateRequestDto;
 import com.example.trello.domain.card.dto.CardRequestDto;
 import com.example.trello.domain.card.dto.CardResponseDto;
 import com.example.trello.domain.card.dto.CardTitleUpdateRequestDto;
@@ -59,6 +60,21 @@ public class CardService {
         card.updateCardTitle(requestDto);
 
         return new CommonResponseDto("카드 제목 수정 성공", HttpStatus.OK.value());
+    }
+
+    @Transactional
+    public ResponseEntity<CommonResponseDto> updateDueDate(Long boardId, Long columnId, Long cardId, CardDueDateUpdateRequestDto requestDto, User user) {
+        findBoardAndColumnByIds(boardId, columnId);
+        Card card = cardRepository.findById(cardId).orElseThrow(() ->
+                new NoSuchElementException("해당 카드를 찾을 수 없습니다. ID: " + cardId));
+
+        card.setDueDate(requestDto.getDueDate());
+
+        if(card.getDueDate() == null) {
+            return ResponseEntity.status(HttpStatus.OK).body(new CommonResponseDto("종료 기한 삭제", HttpStatus.OK.value()));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(new CommonResponseDto("종료 기한 수정", HttpStatus.OK.value()));
     }
 
     @Transactional

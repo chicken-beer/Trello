@@ -1,5 +1,6 @@
 package com.example.trello.domain.card.controller;
 
+import com.example.trello.domain.card.dto.CardDueDateUpdateRequestDto;
 import com.example.trello.domain.card.dto.CardRequestDto;
 import com.example.trello.domain.card.dto.CardResponseDto;
 import com.example.trello.domain.card.dto.CardTitleUpdateRequestDto;
@@ -59,6 +60,18 @@ public class CardController {
         CommonResponseDto responseDto = cardService.updateCardTitle(boardId, columnId, cardId, requestDto, userDetails.getUser());
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    // 카드 종료 기한 설정
+    @PatchMapping("/{cardId}/duedate")
+    public ResponseEntity<CommonResponseDto> updateDueDate(
+            @PathVariable Long boardId,
+            @PathVariable Long columnId,
+            @PathVariable Long cardId,
+            @RequestBody CardDueDateUpdateRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        return cardService.updateDueDate(boardId, columnId, cardId, requestDto, userDetails.getUser());
     }
 
     // 카드 삭제
