@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/boards/{boardId}/columns")
@@ -42,5 +44,11 @@ public class ColumnController {
                                                        @PathVariable Long columnId) {
         ColumnResponseDto columnResponseDto = columnService.getColumn(boardId,columnId);
         return ResponseEntity.ok().body(columnResponseDto);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ColumnResponseDto>> getColumnList(@PathVariable Long boardId) {
+        List<ColumnResponseDto> columnResponseDtoList = columnService.getColumnList(boardId);
+        return ResponseEntity.ok().body(columnResponseDtoList);
     }
 }

@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -53,6 +54,20 @@ public class ColumnService {
                 cardRepository.findAllByColumns_Id(columnId).stream().map(CardResponseDto::new).toList();
 
         return new ColumnResponseDto(columns.getName(), cardResponseDtoList);
+    }
+
+    public List<ColumnResponseDto> getColumnList(Long boardId) {
+        Board board = checkBoardId(boardId);
+
+        List<ColumnResponseDto> columnResponseDtoList = new ArrayList<>();
+        columnRepository.findAllByBoard(board).stream().forEach(a -> {
+            columnResponseDtoList.add(new ColumnResponseDto(
+                    a.getName(),
+                    cardRepository.findAllByColumns_Id(a.getId()).stream().map(CardResponseDto::new).toList()
+                    ));
+        });
+
+        return columnResponseDtoList;
     }
 
 
