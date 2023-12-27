@@ -1,8 +1,7 @@
 package com.example.trello.domain.column.controller;
 
+import com.example.trello.domain.column.dto.ColumnRequestDto;
 import com.example.trello.domain.column.dto.ColumnResponseDto;
-import com.example.trello.domain.column.dto.PostColumnRequestDto;
-import com.example.trello.domain.column.dto.UpdateColumnRequestDto;
 import com.example.trello.domain.column.service.ColumnService;
 import com.example.trello.global.CommonResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,7 @@ public class ColumnController {
     private final ColumnService columnService;
 
     @PostMapping
-    public ResponseEntity<CommonResponseDto> postColumn(@PathVariable Long boardId, @RequestBody PostColumnRequestDto requestDto) {
+    public ResponseEntity<CommonResponseDto> postColumn(@PathVariable Long boardId, @RequestBody ColumnRequestDto requestDto) {
         columnService.postColumn(boardId,requestDto);
         return ResponseEntity.ok().body(new CommonResponseDto("컬럼 생성 성공", HttpStatus.OK.value()));
     }
@@ -26,7 +25,7 @@ public class ColumnController {
     @PatchMapping("/{columnId}")
     public ResponseEntity<CommonResponseDto> updateColumn(@PathVariable Long boardId,
                                                           @PathVariable Long columnId,
-                                                          @RequestBody UpdateColumnRequestDto requestDto) {
+                                                          @RequestBody ColumnRequestDto requestDto) {
         columnService.updateColumn(boardId,columnId,requestDto);
         return ResponseEntity.ok().body(new CommonResponseDto("컬럼 수정 성공", HttpStatus.OK.value()));
     }

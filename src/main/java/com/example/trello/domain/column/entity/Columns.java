@@ -1,7 +1,7 @@
 package com.example.trello.domain.column.entity;
 
-import com.example.trello.domain.column.dto.PostColumnRequestDto;
-import com.example.trello.domain.column.dto.UpdateColumnRequestDto;
+import com.example.trello.domain.board.Board;
+import com.example.trello.domain.column.dto.ColumnRequestDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -22,13 +22,17 @@ public class Columns {
 
     private Boolean isArchived;
 
+    @ManyToOne
+    @JoinColumn(name = "board_id")
+    private Board board;
 
-    public Columns(PostColumnRequestDto requestDto) {
+    public Columns(Board board, ColumnRequestDto requestDto) {
+        this.board = board;
         this.name = requestDto.getName();
         isArchived=false;
     }
 
-    public void update(UpdateColumnRequestDto requestDto) {
+    public void update(ColumnRequestDto requestDto) {
         this.name = requestDto.getName();
     }
 

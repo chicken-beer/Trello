@@ -1,11 +1,11 @@
 package com.example.trello.domain.column.service;
 
+import com.example.trello.domain.board.Board;
 import com.example.trello.domain.board.BoardRepository;
 import com.example.trello.domain.card.dto.CardResponseDto;
 import com.example.trello.domain.card.repository.CardRepository;
+import com.example.trello.domain.column.dto.ColumnRequestDto;
 import com.example.trello.domain.column.dto.ColumnResponseDto;
-import com.example.trello.domain.column.dto.PostColumnRequestDto;
-import com.example.trello.domain.column.dto.UpdateColumnRequestDto;
 import com.example.trello.domain.column.entity.Columns;
 import com.example.trello.domain.column.repository.ColumnRepository;
 import jakarta.transaction.Transactional;
@@ -22,17 +22,17 @@ public class ColumnService {
     private final BoardRepository boardRepository;
     private final CardRepository cardRepository;
 
-    public void postColumn(Long boardId, PostColumnRequestDto requestDto) {
-        checkBoardId(boardId);
+    public void postColumn(Long boardId, ColumnRequestDto requestDto) {
+        Board board = checkBoardId(boardId);
 
-        Columns columns = new Columns(requestDto);
+        Columns columns = new Columns(board,requestDto);
         columnRepository.save(columns);
     }
 
     @Transactional
-    public void updateColumn(Long boardId, Long columnId, UpdateColumnRequestDto requestDto) {
+    public void updateColumn(Long boardId, Long columnId, ColumnRequestDto requestDto) {
         checkBoardId(boardId);
-        Columns columns = checkColumnIdAndReturnColumn(columnId);
+        Columns columns = checkColumnId(columnId);
 
         columns.update(requestDto);
     }
@@ -40,14 +40,14 @@ public class ColumnService {
     @Transactional
     public void deleteColumn(Long boardId, Long columnId) {
         checkBoardId(boardId);
-        Columns columns = checkColumnIdAndReturnColumn(columnId);
+        Columns columns = checkColumnId(columnId);
 
         columns.delete();
     }
 
     public ColumnResponseDto getColumn(Long boardId, Long columnId) {
         checkBoardId(boardId);
-        Columns columns = checkColumnIdAndReturnColumn(columnId);
+        Columns columns = checkColumnId(columnId);
 
         List<CardResponseDto> cardResponseDtoList =
                 cardRepository.findAllByColumns_Id(columnId).stream().map(CardResponseDto::new).toList();
@@ -56,12 +56,13 @@ public class ColumnService {
     }
 
 
-    private void checkBoardId(Long boardId) {
-        boardRepository.findById(boardId).orElseThrow(()
+    private Board checkBoardId(Long boardId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(()
                 -> new IllegalArgumentException("존재하지 않는 boardId입니다."));
+        return board;
     }
 
-    private Columns checkColumnIdAndReturnColumn(Long columnId) {
+    private Columns checkColumnId(Long columnId) {
         Columns columns = columnRepository.findById(columnId).orElseThrow(()
                 -> new IllegalArgumentException("존재하지 않는 컬럼입니다."));
         return columns;
