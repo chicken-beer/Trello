@@ -3,11 +3,12 @@ package com.example.trello.domain.user.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor
 public class UserSignupDto {
 
@@ -20,16 +21,7 @@ public class UserSignupDto {
     private String password;
 
     @NotBlank(message = "유저명을 입력하세요.")
-    @Pattern(regexp ="^[a-zA-Z0-9]{3,}$", message = "유저명을 확인해주세요.")
     private String username;
 
     private String description;
-
-    @Builder
-    public UserSignupDto(String loginId, String password, String username, String description) {
-        this.loginId = loginId;
-        this.password = password;
-        this.username = username;
-        this.description = description;
-    }
 }
