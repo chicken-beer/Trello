@@ -29,7 +29,7 @@ public class UserController {
         if(fieldErrors.size() > 0) {
             List<FieldErrorDto> fieldErrorDtoList =fieldErrors.stream().map(FieldErrorDto::new).toList();
             throw new FieldErrorException(
-                    "허용된 username 또는 password 값이 아닙니다.",
+                    "허용된 입력값이 아닙니다.",
                     HttpStatus.BAD_REQUEST.value(),
                     fieldErrorDtoList);
         }
