@@ -10,9 +10,11 @@ import com.example.trello.domain.card.repository.CardRepository;
 import com.example.trello.domain.column.entity.Columns;
 import com.example.trello.domain.column.repository.ColumnRepository;
 import com.example.trello.domain.user.entity.User;
+import com.example.trello.domain.user.repository.UserRepository;
 import com.example.trello.global.CommonResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,7 @@ import java.util.NoSuchElementException;
 @Service
 public class CardService {
 
+    private final UserRepository userRepository;
     private final BoardRepository boardRepository;
     private final ColumnRepository columnRepository;
     private final CardRepository cardRepository;
@@ -66,10 +69,10 @@ public class CardService {
 
         if(card.getIsArchived()) {
             card.setIsArchived(false);
-            return new CommonResponseDto("목표 달성 취소", HttpStatus.OK.value());
+            return new CommonResponseDto("카드 숨김 취소", HttpStatus.OK.value());
         } else {
             card.setIsArchived(true);
-            return new CommonResponseDto("목표 달성", HttpStatus.OK.value());
+            return new CommonResponseDto("카드 숨김", HttpStatus.OK.value());
         }
     }
 
@@ -80,7 +83,24 @@ public class CardService {
 
         cardRepository.delete(card);
 
-        return new CommonResponseDto("카드 삭제 완료", HttpStatus.NO_CONTENT.value());
+        return new CommonResponseDto("카드 삭제 완료 ", HttpStatus.NO_CONTENT.value());
+    }
+
+    @Transactional
+    public ResponseEntity<CommonResponseDto> toggleUserToCard(Long boardId, Long columnId, Long cardId, Long userId, User user1) {
+        findBoardAndColumnByIds(boardId, columnId);
+        Card card = cardRepository.findById(cardId).orElseThrow(() ->
+                new NoSuchElementException("해당 카드를 찾을 수 없습니다. ID: " + cardId));
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new NoSuchElementException("해당 유저를 찾을 수 없습니다. ID: " + userId));
+
+        if (card.getUsers().contains(user)) {
+            card.getUsers().remove(user);
+            return ResponseEntity.status(HttpStatus.OK).body(new CommonResponseDto("카드 유저 제거", HttpStatus.OK.value()));
+        } else {
+            card.getUsers().add(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponseDto("카드 유저 등록", HttpStatus.CREATED.value()));
+        }
     }
 
     private void findBoardAndColumnByIds(Long boardId, Long columnId) {
