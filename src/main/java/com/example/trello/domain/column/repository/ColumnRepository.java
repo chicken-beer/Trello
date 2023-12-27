@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ColumnRepository extends JpaRepository<Columns,Long> {
 
@@ -15,4 +14,15 @@ public interface ColumnRepository extends JpaRepository<Columns,Long> {
 
     @Query("SELECT MAX(c.columnOrder) FROM Columns c WHERE c.board = :board")
     Integer findMaxColumnOrderByBoard(@Param("board") Board board);
+
+    List<Columns> findAllByBoardAndColumnOrderGreaterThanAndColumnOrderLessThanEqual(
+            Board board,
+            Integer greaterThanColumnOrder,
+            Integer lessThanOrEqualColumnOrder
+    );
+
+    List<Columns> findAllByBoardAndColumnOrderLessThanAndColumnOrderGreaterThanEqual(
+            Board board,
+            Integer lessThanColumnOrder,
+            Integer greaterThanEqualColumnOrder);
 }

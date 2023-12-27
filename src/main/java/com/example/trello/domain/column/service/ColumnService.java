@@ -26,12 +26,12 @@ public class ColumnService {
     public void postColumn(Long boardId, ColumnRequestDto requestDto) {
         Board board = checkBoardId(boardId);
 
-        Integer lastColumnOrder = columnRepository.findMaxColumnOrderByBoard(board);
-        if (lastColumnOrder==null) {
-            lastColumnOrder=0;
+        Integer lastColumnOrderInBoard = columnRepository.findMaxColumnOrderByBoard(board);
+        if (lastColumnOrderInBoard==null) {
+            lastColumnOrderInBoard=0;
         }
 
-        Columns columns = new Columns(board,requestDto, lastColumnOrder);
+        Columns columns = new Columns(board,requestDto, lastColumnOrderInBoard);
         columnRepository.save(columns);
     }
 
@@ -44,16 +44,39 @@ public class ColumnService {
     }
 
     @Transactional
-    public void updateColumnOrder(Long boardId, Long columnId1, Long columnId2) {
-        checkBoardId(boardId);
-        Columns column1 = checkColumnId(columnId1);
-        Columns column2 = checkColumnId(columnId2);
+    public void updateColumnOrder(Long boardId, Long columnId, Integer columnOrder) {
+        Board board = checkBoardId(boardId);
+        Columns targetColumn = checkColumnId(columnId);
 
-        Integer column1ColumnOrder = column1.getColumnOrder();
-        Integer column2ColumnOrder = column2.getColumnOrder();
+        Integer lastColumnOrderInBoard = columnRepository.findMaxColumnOrderByBoard(board);
+        if (columnOrder > lastColumnOrderInBoard) {
+            throw new IllegalArgumentException("입력한 순서가 컬럼 개수를 초과합니다.");
+        }
+        if (columnOrder < 1) {
+            throw new IllegalArgumentException("컬럼 순서는 1부터 시작합니다.");
+        }
 
-        column1.updateColumnOder(column2ColumnOrder);
-        column2.updateColumnOder(column1ColumnOrder);
+        if (targetColumn.getColumnOrder()==columnOrder) {
+            throw new IllegalArgumentException("기존과 동일한 컬럼 순서 입니다.");
+        }
+
+        // 칼럼 순서를 바꿔 줄 때 순서를 앞에서 뒤로 바꾼다면
+        // 그 사이에 있는 순서값들을 모두 -1 하고 순서를 옮김
+        if (targetColumn.getColumnOrder()<columnOrder) {
+            columnRepository.findAllByBoardAndColumnOrderGreaterThanAndColumnOrderLessThanEqual(
+                    board, targetColumn.getColumnOrder(), columnOrder)
+                    .stream().forEach(a -> a.updateColumnOder(a.getColumnOrder()-1));
+            targetColumn.updateColumnOder(columnOrder);
+        }
+
+        // 순서를 뒤에서 앞으로 바꾼다면
+        // 그 사이에 있는 순서값들을 모두 +1 하고 순서를 옮김
+        if (targetColumn.getColumnOrder()>columnOrder) {
+            columnRepository.findAllByBoardAndColumnOrderLessThanAndColumnOrderGreaterThanEqual(
+                            board, targetColumn.getColumnOrder(), columnOrder)
+                    .stream().forEach(a -> a.updateColumnOder(a.getColumnOrder()+1));
+            targetColumn.updateColumnOder(columnOrder);
+        }
     }
 
     @Transactional

@@ -32,11 +32,11 @@ public class ColumnController {
         return ResponseEntity.ok().body(new CommonResponseDto("컬럼 이름 수정 성공", HttpStatus.OK.value()));
     }
 
-    @PatchMapping("/swap-order/{columnId1}/{columnId2}")
+    @PatchMapping("/{columnId}/order/{columnOrder}")
     public ResponseEntity<CommonResponseDto> updateColumnOrder(@PathVariable Long boardId,
-                                                               @PathVariable Long columnId1,
-                                                               @PathVariable Long columnId2) {
-        columnService.updateColumnOrder(boardId,columnId1,columnId2);
+                                                               @PathVariable Long columnId,
+                                                               @PathVariable Integer columnOrder) {
+        columnService.updateColumnOrder(boardId,columnId,columnOrder);
         return ResponseEntity.ok().body(new CommonResponseDto("컬럼 순서 수정 성공", HttpStatus.OK.value()));
     }
 
