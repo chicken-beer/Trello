@@ -1,6 +1,6 @@
 package com.example.trello.domain.column.entity;
 
-import com.example.trello.domain.board.Board;
+import com.example.trello.domain.board.entity.Board;
 import com.example.trello.domain.column.dto.ColumnRequestDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

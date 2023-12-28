@@ -1,7 +1,7 @@
 package com.example.trello.domain.column.service;
 
-import com.example.trello.domain.board.Board;
-import com.example.trello.domain.board.BoardRepository;
+import com.example.trello.domain.board.entity.Board;
+import com.example.trello.domain.board.repository.BoardRepository;
 import com.example.trello.domain.card.dto.CardResponseDto;
 import com.example.trello.domain.card.repository.CardRepository;
 import com.example.trello.domain.column.dto.ColumnRequestDto;
