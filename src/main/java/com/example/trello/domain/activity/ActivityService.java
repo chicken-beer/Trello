@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ActivityService {
+public class ActivityService extends ActivityComments {
 
     private final ActivityRepository activityRepository;
     private final UserRepository userRepository;
@@ -22,7 +22,7 @@ public class ActivityService {
         User addedUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("aop, search by userId. 없을리가 없습니다."));
         User addingUser = userDetails.getUser();
 
-        String contents = addingUser.getUsername()+"가 "+addedUser.getUsername()+"을 추가했습니다.";
+        String contents = AddUser(addingUser.getUsername(),addedUser.getUsername());
 
         Activity activity = new Activity(contents, card, addingUser);
 
