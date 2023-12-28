@@ -1,5 +1,7 @@
 package com.example.trello.global.exception;
 
+import com.example.trello.global.exception.fieldError.FieldErrorException;
+import com.example.trello.global.exception.fieldError.FieldErrorResponseDto;
 import com.example.trello.global.response.ApiResponse;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
@@ -50,5 +52,15 @@ public class GlobalExceptionHandler {
 		HttpStatus hs = ex.getStatus();
 		final ErrorResponse errorResponse = ErrorResponse.create( ex, hs, ex.getMessage() );
 		return ResponseEntity.status( hs ).body( ApiResponse.fail( errorResponse ) );
+	}
+
+	@ExceptionHandler({FieldErrorException.class})
+	public ResponseEntity<FieldErrorResponseDto> FieldErrorException(FieldErrorException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+				new FieldErrorResponseDto(
+						ex.getMessage(),
+						ex.getStatus(),
+						ex.getFieldErrorDtoList()
+				));
 	}
 }
