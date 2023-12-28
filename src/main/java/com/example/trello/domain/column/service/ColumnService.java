@@ -101,10 +101,12 @@ public class ColumnService {
         Board board = checkBoardId(boardId);
 
         List<ColumnResponseDto> columnResponseDtoList = new ArrayList<>();
-        columnRepository.findAllByBoardOrderByColumnOrder(board).stream().forEach(a -> {
-            columnResponseDtoList.add(new ColumnResponseDto(
-                    a.getName(),
-                    cardRepository.findAllByColumns_Id(a.getId()).stream().map(CardResponseDto::new).toList()
+        columnRepository.findAllByBoardOrderByColumnOrder(board)
+                .stream().forEach(a -> {
+            columnResponseDtoList.add(
+                    new ColumnResponseDto(a.getName(),
+                            cardRepository.findAllByColumns_Id(a.getId())
+                            .stream().map(CardResponseDto::new).toList()
                     ));
         });
 
