@@ -1,5 +1,6 @@
 package com.example.trello.domain.user.entity;
 
+import com.example.trello.domain.user.dto.UserProfileDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -33,5 +34,14 @@ public class User {
         this.password = password;
         this.username = username;
         this.description = description;
+    }
+
+    public void updateProfile(UserProfileDto updateDto) {
+        this.username = updateDto.getUsername();
+        this.description = updateDto.getDescription();
+    }
+
+    public void updatePassword(String newPwd) {
+        this.password = newPwd;
     }
 }
