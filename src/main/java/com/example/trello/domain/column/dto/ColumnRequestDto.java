@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostColumnRequestDto {
+public class ColumnRequestDto {
 
     private String name;
 

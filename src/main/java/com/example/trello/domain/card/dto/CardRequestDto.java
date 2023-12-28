@@ -9,11 +9,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class CardRequestDto {
-    // trello에서 제목을 제외하고는 값이 들어가지 않아도 카드 생성이 됩니다.
     @NotBlank
     private String title;
     private String description;
     private String coverImg;
-    private LocalDateTime dueDate;
     private Boolean isArchived;
 }
