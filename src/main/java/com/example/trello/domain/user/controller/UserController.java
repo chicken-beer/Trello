@@ -1,21 +1,16 @@
 package com.example.trello.domain.user.controller;
 
 import com.example.trello.domain.user.dto.UserPasswordDto;
-import com.example.trello.domain.user.dto.UserSignupDto;
 import com.example.trello.domain.user.dto.UserProfileDto;
+import com.example.trello.domain.user.dto.UserSignupDto;
 import com.example.trello.domain.user.service.UserService;
 import com.example.trello.global.response.ApiResponse;
 import com.example.trello.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
