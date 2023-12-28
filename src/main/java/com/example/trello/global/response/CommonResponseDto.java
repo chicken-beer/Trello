@@ -1,4 +1,4 @@
-package com.example.trello.global;
+package com.example.trello.global.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;

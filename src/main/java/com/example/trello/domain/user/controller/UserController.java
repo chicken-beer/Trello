@@ -1,8 +1,8 @@
 package com.example.trello.domain.user.controller;
 
 import com.example.trello.domain.user.dto.UserPasswordDto;
-import com.example.trello.domain.user.dto.UserSignupDto;
 import com.example.trello.domain.user.dto.UserProfileDto;
+import com.example.trello.domain.user.dto.UserSignupDto;
 import com.example.trello.domain.user.service.UserService;
 import com.example.trello.global.response.ApiResponse;
 import com.example.trello.global.security.UserDetailsImpl;

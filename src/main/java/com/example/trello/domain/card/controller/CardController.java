@@ -5,7 +5,7 @@ import com.example.trello.domain.card.dto.CardRequestDto;
 import com.example.trello.domain.card.dto.CardResponseDto;
 import com.example.trello.domain.card.dto.CardTitleUpdateRequestDto;
 import com.example.trello.domain.card.service.CardService;
-import com.example.trello.global.CommonResponseDto;
+import com.example.trello.global.response.CommonResponseDto;
 import com.example.trello.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
