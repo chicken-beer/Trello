@@ -1,25 +1,27 @@
 package com.example.trello.domain.user.service;
 
 import com.example.trello.domain.user.dto.UserPasswordDto;
+import com.example.trello.domain.user.dto.UserProfileDto;
 import com.example.trello.domain.user.dto.UserResponseDto;
 import com.example.trello.domain.user.dto.UserSignupDto;
-import com.example.trello.domain.user.dto.UserProfileDto;
 import com.example.trello.domain.user.entity.User;
 import com.example.trello.domain.user.repository.UserRepository;
 import com.example.trello.global.exception.CustomException;
+import com.example.trello.global.jwt.JwtUtil;
 import com.example.trello.global.redis.RedisRepository;
 import com.example.trello.global.security.UserDetailsImpl;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
+    private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RedisRepository redisRepository;
@@ -51,6 +53,18 @@ public class UserService {
         if (redisRepository.hasRefreshToken(key)) redisRepository.deleteRefreshToken(key);
     }
 
+    public String reissue(String token) {
+        if (StringUtils.hasText(token)) {
+            String key = token.substring(7);
+            if (redisRepository.hasRefreshToken(key)) {
+                String refreshToken = redisRepository.getRefreshToken(key);
+                String loginId = jwtUtil.getUserInfoFromToken(refreshToken).getSubject();
+                return jwtUtil.createAccessToken(loginId);
+            }
+        }
+        throw new CustomException(HttpStatus.BAD_REQUEST, "토큰이 유효하지 않습니다.");
+    }
+
     public UserResponseDto getProfile(UserDetailsImpl userDetails) {
         return new UserResponseDto(userDetails.getUser());
     }
@@ -65,7 +79,7 @@ public class UserService {
     }
 
     @Transactional
-    public void updatePassword(UserDetailsImpl userDetails, @Valid UserPasswordDto passwordDto) {
+    public void updatePassword(UserDetailsImpl userDetails, UserPasswordDto passwordDto) {
         User user = findUser(userDetails);
 
         String oldPwd = passwordDto.getOldPassword();

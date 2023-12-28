@@ -5,6 +5,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -46,9 +47,16 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler
-	public ResponseEntity handlerCustomException(CustomException ex) {
+	public ResponseEntity<ApiResponse> handlerCustomException(CustomException ex) {
 		HttpStatus hs = ex.getStatus();
 		final ErrorResponse errorResponse = ErrorResponse.create( ex, hs, ex.getMessage() );
+		return ResponseEntity.status( hs ).body( ApiResponse.fail( errorResponse ) );
+	}
+
+	@ExceptionHandler
+	public ResponseEntity<ApiResponse> handlerMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+		HttpStatus hs = HttpStatus.BAD_REQUEST;
+		final ErrorResponse errorResponse = ErrorResponse.create( ex, hs, ex.getBindingResult().getAllErrors().get(0).getDefaultMessage() );
 		return ResponseEntity.status( hs ).body( ApiResponse.fail( errorResponse ) );
 	}
 }
