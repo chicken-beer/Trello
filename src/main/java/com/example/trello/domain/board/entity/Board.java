@@ -27,7 +27,7 @@ public class Board {
     private String title;
 
     @Column
-    private String backImg;
+    private String filename;
 
     @Column
     private String description;
@@ -38,13 +38,13 @@ public class Board {
     public Board(BoardRequestDto boardRequestDto, User user) {
         this.creator = user.getLoginId();
         this.title = boardRequestDto.getTitle();
-        this.backImg = boardRequestDto.getBackImg();
+        this.filename = boardRequestDto.getFilename();
         this.description = boardRequestDto.getDescription();
     }
 
     public void update(BoardRequestDto boardRequestDto) {
         this.title = boardRequestDto.getTitle();
-        this.backImg = boardRequestDto.getBackImg();
+        this.filename = boardRequestDto.getFilename();
         this.description = boardRequestDto.getDescription();
     }
 
