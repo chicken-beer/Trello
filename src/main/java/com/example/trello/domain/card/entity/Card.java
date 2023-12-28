@@ -3,12 +3,15 @@ package com.example.trello.domain.card.entity;
 import com.example.trello.domain.card.dto.CardRequestDto;
 import com.example.trello.domain.card.dto.CardTitleUpdateRequestDto;
 import com.example.trello.domain.column.entity.Columns;
+import com.example.trello.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @Getter
@@ -32,7 +35,6 @@ public class Card {
         this.title = requestDto.getTitle();
         this.description = requestDto.getDescription();
         this.coverImg = requestDto.getCoverImg();
-        this.dueDate = requestDto.getDueDate();
         this.isArchived = requestDto.getIsArchived();
         this.columns = columns;
     }
@@ -41,6 +43,12 @@ public class Card {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "column_id")
     private Columns columns;
+
+    @ManyToMany
+    @JoinTable(name = "members",
+    joinColumns = @JoinColumn(name = "card_id"),
+    inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<User> users = new ArrayList<>();
 
     // 연관관계 편의 메소드 - 반대쪽에는 연관관계 편의 메소드가 없도록 주의합니다.
 

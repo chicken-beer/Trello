@@ -1,6 +1,6 @@
-package com.example.trello.domain.boardUsers;
+package com.example.trello.domain.boardUsers.entity;
 
-import com.example.trello.domain.board.Board;
+import com.example.trello.domain.board.entity.Board;
 import com.example.trello.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -26,10 +26,14 @@ public class BoardUsers{
     @MapsId("userId")
     private User user;
 
+    @Column(nullable = false)
+    private String userRole;
+
     @Builder
-    public BoardUsers(Board board, User user){
+    public BoardUsers(Board board, User user, String userRole){
         this.board = board;
         this.user = user;
+        this.userRole = userRole;
         this.boardUsersPK = BoardUsersPK.builder()
                 .boardId(board.getId())
                 .userId(user.getId())
