@@ -1,13 +1,20 @@
 package com.example.trello.domain.user.service;
 
+import com.example.trello.domain.user.dto.UserPasswordDto;
+import com.example.trello.domain.user.dto.UserResponseDto;
 import com.example.trello.domain.user.dto.UserSignupDto;
+import com.example.trello.domain.user.dto.UserProfileDto;
 import com.example.trello.domain.user.entity.User;
 import com.example.trello.domain.user.repository.UserRepository;
 import com.example.trello.global.exception.CustomException;
+import com.example.trello.global.redis.RedisRepository;
+import com.example.trello.global.security.UserDetailsImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +22,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RedisRepository redisRepository;
 
     public void signup(UserSignupDto request) {
 
@@ -38,4 +46,46 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void logout(String token) {
+        String key = token.substring(7);
+        if (redisRepository.hasRefreshToken(key)) redisRepository.deleteRefreshToken(key);
+    }
+
+    public UserResponseDto getProfile(UserDetailsImpl userDetails) {
+        return new UserResponseDto(userDetails.getUser());
+    }
+
+    @Transactional
+    public void updateProfile(UserDetailsImpl userDetails, UserProfileDto updateDto) {
+        User user = findUser(userDetails);
+
+        if(updateDto.getUsername()==null) updateDto.setUsername(user.getUsername());
+        if(updateDto.getDescription()==null) updateDto.setDescription(user.getDescription());
+        user.updateProfile(updateDto);
+    }
+
+    @Transactional
+    public void updatePassword(UserDetailsImpl userDetails, @Valid UserPasswordDto passwordDto) {
+        User user = findUser(userDetails);
+
+        String oldPwd = passwordDto.getOldPassword();
+        String newPwd = passwordDto.getNewPassword();
+        String chkPwd = passwordDto.getCheckPassword();
+
+        if (!passwordEncoder.matches(oldPwd, userDetails.getPassword())) throw new CustomException(HttpStatus.BAD_REQUEST, "현재 비밀번호가 다릅니다.");
+        if (!newPwd.equals(chkPwd)) throw new CustomException(HttpStatus.BAD_REQUEST, "변경할 비밀번호와 확인용 비밀번호가 다릅니다.");
+        if (oldPwd.equals(newPwd)) throw new CustomException(HttpStatus.BAD_REQUEST, "기존 비밀번호와 변경할 비밀번호가 같습니다.");
+
+        user.updatePassword(passwordEncoder.encode(newPwd));
+    }
+
+    public void deleteUser(UserDetailsImpl userDetails) {
+        userRepository.delete(userDetails.getUser());
+    }
+
+    private User findUser(UserDetailsImpl userDetails) {
+        String loginId = userDetails.getUsername();
+        return userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, "존재하지 않는 사용자입니다."));
+    }
 }
