@@ -39,4 +39,8 @@ public class BoardUsers{
                 .userId(user.getId())
                 .build();
     }
+
+    public void updateUserRole(String userRole) {
+        this.userRole = userRole;
+    }
 }
