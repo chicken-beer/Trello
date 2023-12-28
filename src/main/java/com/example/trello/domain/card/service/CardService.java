@@ -159,6 +159,27 @@ public class CardService {
         }
     }
 
+    @Transactional
+    public void moveCardToAnotherColumns(Long boardId, Long columnId, Long cardId) {
+        boardRepository.findById(boardId).orElseThrow(() ->
+                new NoSuchElementException("해당 보드를 찾을 수 없습니다. ID: " + boardId));
+        Columns columns = columnRepository.findById(columnId).orElseThrow(() ->
+                new NoSuchElementException("해당 컬럼을 찾을 수 없습니다. ID: " + columnId));
+        Card card = cardRepository.findById(cardId).orElseThrow(() ->
+                new NoSuchElementException("해당 카드를 찾을 수 없습니다. ID: " + cardId));
+
+        if (card.getColumns().getId().equals(columns.getId())) {
+            throw new IllegalArgumentException("동일한 컬럼으로 이동할 수 없습니다.");
+        }
+
+        Integer lastCardOrderInColumns = cardRepository.findMaxColumnOrderByColumns(columns);
+        if (lastCardOrderInColumns==null) {
+            lastCardOrderInColumns=0;
+        }
+
+        card.updateColumns(columns,lastCardOrderInColumns);
+    }
+
 
     private void findBoardAndColumnByIds(Long boardId, Long columnId) {
         boardRepository.findById(boardId).orElseThrow(() ->

@@ -113,14 +113,23 @@ public class CardController {
         return cardService.toggleUserToCard(boardId, columnId, cardId, userId, userDetails.getUser());
     }
 
-    // 카드 이동
+    // 카드 순서 변경
     @PatchMapping("/{cardId}/order/{cardOrder}")
-    public ResponseEntity<ApiResponse> updateColumnOrder(@PathVariable Long boardId,
+    public ResponseEntity<ApiResponse> updateCardOrder(@PathVariable Long boardId,
                                                          @PathVariable Long columnId,
                                                          @PathVariable Long cardId,
                                                          @PathVariable Integer cardOrder) {
         cardService.updateCardOrder(boardId,columnId,cardId, cardOrder);
         return ResponseEntity.ok( ApiResponse.ok( "카드 순서 수정 성공" ) );
+    }
+
+    // 카드 컬럼 이동
+    @PatchMapping("/{cardId}")
+    public ResponseEntity<ApiResponse> moveCardToAnotherColumns(@PathVariable Long boardId,
+                                                         @PathVariable Long columnId,
+                                                         @PathVariable Long cardId) {
+        cardService.moveCardToAnotherColumns(boardId,columnId,cardId);
+        return ResponseEntity.ok( ApiResponse.ok( "카드 이동 수정 성공" ) );
     }
 
 

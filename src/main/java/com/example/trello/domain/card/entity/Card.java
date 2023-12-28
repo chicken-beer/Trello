@@ -63,4 +63,9 @@ public class Card {
     public void updateCardOrder(Integer cardOrder) {
         this.cardOrder = cardOrder;
     }
+
+    public void updateColumns(Columns columns, Integer lastCardOrderInColumns) {
+        this.columns = columns;
+        this.cardOrder = lastCardOrderInColumns+1;
+    }
 }
