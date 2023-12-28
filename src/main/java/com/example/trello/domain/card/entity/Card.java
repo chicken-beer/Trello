@@ -29,14 +29,16 @@ public class Card {
     private String coverImg;
     private LocalDateTime dueDate;
     private Boolean isArchived;
+    private Integer cardOrder;
 
     // 생성자 - 약속된 형태로만 생성가능하도록 합니다.
-    public Card(CardRequestDto requestDto, Columns columns) {
+    public Card(CardRequestDto requestDto, Columns columns, Integer lastCardOrderInColumns) {
         this.title = requestDto.getTitle();
         this.description = requestDto.getDescription();
         this.coverImg = requestDto.getCoverImg();
         this.isArchived = requestDto.getIsArchived();
         this.columns = columns;
+        this.cardOrder = lastCardOrderInColumns+1;
     }
 
     // 연관관계 - Foreign Key 값을 따로 컬럼으로 정의하지 않고 연관 관계로 정의합니다.
@@ -56,5 +58,9 @@ public class Card {
     // 서비스 메소드 - 외부에서 엔티티를 수정할 메소드를 정의합니다. (단일 책임을 가지도록 주의합니다.)
     public void updateCardTitle(CardTitleUpdateRequestDto requestDto) {
         this.title = requestDto.getTitle();
+    }
+
+    public void updateCardOrder(Integer cardOrder) {
+        this.cardOrder = cardOrder;
     }
 }

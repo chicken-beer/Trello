@@ -37,7 +37,12 @@ public class CardService {
         Columns columns = columnRepository.findById(columnId).orElseThrow(() ->
                 new NoSuchElementException("해당 컬럼을 찾을 수 없습니다. ID: " + columnId));
 
-        Card card = new Card(requestDto, columns);
+        Integer lastCardOrderInColumns = cardRepository.findMaxColumnOrderByColumns(columns);
+        if (lastCardOrderInColumns==null) {
+            lastCardOrderInColumns=0;
+        }
+
+        Card card = new Card(requestDto, columns, lastCardOrderInColumns);
         cardRepository.save(card);
 
         return new CommonResponseDto("카드 생성 성공", HttpStatus.CREATED.value());
@@ -118,6 +123,42 @@ public class CardService {
             return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponseDto("카드 유저 등록", HttpStatus.CREATED.value()));
         }
     }
+
+    @Transactional
+    public void updateCardOrder(Long boardId, Long columnId, Long cardId, Integer cardOrder) {
+        boardRepository.findById(boardId).orElseThrow(() ->
+                new NoSuchElementException("해당 보드를 찾을 수 없습니다. ID: " + boardId));
+        Columns column = columnRepository.findById(columnId).orElseThrow(() ->
+                new NoSuchElementException("해당 컬럼을 찾을 수 없습니다. ID: " + columnId));
+        Card card = cardRepository.findById(cardId).orElseThrow(() ->
+                new NoSuchElementException("해당 카드를 찾을 수 없습니다. ID: " + cardId));
+
+        Integer lastCardOrderInColumns = cardRepository.findMaxColumnOrderByColumns(column);
+        if (cardOrder > lastCardOrderInColumns) {
+            throw new IllegalArgumentException("입력한 순서가 카드의 개수를 초과합니다.");
+        }
+        if (cardOrder < 1) {
+            throw new IllegalArgumentException("컬럼 순서는 1부터 시작합니다.");
+        }
+        if (card.getCardOrder()==cardOrder) {
+            throw new IllegalArgumentException("기존과 동일한 카드 순서입니다.");
+        }
+
+        if (card.getCardOrder() < cardOrder) {
+            cardRepository.findAllByColumnsAndCardOrderGreaterThanAndCardOrderLessThanEqual(
+                    column, card.getCardOrder(), cardOrder)
+                    .stream().forEach(a -> a.updateCardOrder(a.getCardOrder()-1));
+            card.updateCardOrder(cardOrder);
+        }
+
+        if (card.getCardOrder() > cardOrder) {
+            cardRepository.findAllByColumnsAndCardOrderLessThanAndCardOrderGreaterThanEqual(
+                            column, card.getCardOrder(), cardOrder)
+                    .stream().forEach(a -> a.updateCardOrder(a.getCardOrder()+1));
+            card.updateCardOrder(cardOrder);
+        }
+    }
+
 
     private void findBoardAndColumnByIds(Long boardId, Long columnId) {
         boardRepository.findById(boardId).orElseThrow(() ->

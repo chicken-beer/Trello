@@ -5,6 +5,7 @@ import com.example.trello.domain.card.dto.CardRequestDto;
 import com.example.trello.domain.card.dto.CardResponseDto;
 import com.example.trello.domain.card.dto.CardTitleUpdateRequestDto;
 import com.example.trello.domain.card.service.CardService;
+import com.example.trello.global.response.ApiResponse;
 import com.example.trello.global.response.CommonResponseDto;
 import com.example.trello.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
@@ -100,7 +101,7 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    // 카드에 멤버 추가, 제거
+    // 카드에 멤버 추가
     @PostMapping("/{cardId}/users/{userId}")
     public ResponseEntity<CommonResponseDto> addUserToCard(
             @PathVariable Long boardId,
@@ -112,6 +113,15 @@ public class CardController {
         return cardService.toggleUserToCard(boardId, columnId, cardId, userId, userDetails.getUser());
     }
 
-    // 카드에 멤버 제거?
+    // 카드 이동
+    @PatchMapping("/{cardId}/order/{cardOrder}")
+    public ResponseEntity<ApiResponse> updateColumnOrder(@PathVariable Long boardId,
+                                                         @PathVariable Long columnId,
+                                                         @PathVariable Long cardId,
+                                                         @PathVariable Integer cardOrder) {
+        cardService.updateCardOrder(boardId,columnId,cardId, cardOrder);
+        return ResponseEntity.ok( ApiResponse.ok( "카드 순서 수정 성공" ) );
+    }
+
 
 }
