@@ -1,8 +1,7 @@
-package com.example.trello.domain.board;
+package com.example.trello.domain.board.dto;
 
+import com.example.trello.domain.board.entity.Board;
 import lombok.Getter;
-
-import java.util.Optional;
 
 @Getter
 public class BoardResponseDto {
