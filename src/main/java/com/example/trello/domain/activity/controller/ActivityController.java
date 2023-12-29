@@ -44,4 +44,17 @@ public class ActivityController {
         ));
     }
 
+    @DeleteMapping("{activityId}")
+    public ResponseEntity<ApiResponse> deleteComment(
+            @PathVariable Long boardId,
+            @PathVariable Long columnId,
+            @PathVariable Long cardId,
+            @PathVariable Long activityId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        return ResponseEntity.ok(ApiResponse.ok(
+                activityService.deleteComment(boardId,columnId,cardId,activityId,userDetails)
+        ));
+    }
+
 }

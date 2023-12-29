@@ -92,6 +92,21 @@ public class ActivityService extends ActivityContents {
         return "comment가 수정되었습니다.";
     }
 
+    public String deleteComment(Long boardId, Long columnId, Long cardId, Long activityId, UserDetailsImpl userDetails) {
+        checkBoardById(boardId);
+        checkColumnsById(columnId);
+        checkCardById(cardId);
+        Activity activity = checkActivityId(activityId);
+
+        User user = userDetails.getUser();
+        if (!user.getUsername().equals(activity.getUser().getUsername())) {
+            throw new IllegalArgumentException("작성자만 삭제 할 수 있습니다.");
+        }
+
+        activityRepository.delete(activity);
+        return "comment가 삭제되었습니다.";
+    }
+
     private Board checkBoardById(Long boardId) {
         return boardRepository.findById(boardId).orElseThrow(
                 () -> new IllegalArgumentException("존재하지 않는 board입니다."));
