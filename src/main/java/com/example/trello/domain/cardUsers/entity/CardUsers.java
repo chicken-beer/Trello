@@ -31,8 +31,8 @@ public class CardUsers {
 
     public CardUsers(Card card, User addingUser, User addedUser) {
         this.card = card;
-        this.addedUser = addingUser;
-        this.addingUser = addedUser;
+        this.addingUser = addingUser;
+        this.addedUser = addedUser;
     }
 }
 
