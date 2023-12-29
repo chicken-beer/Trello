@@ -1,5 +1,6 @@
 package com.example.trello.domain.activity.service;
 
+import com.example.trello.domain.activity.dto.ActivityResponseDto;
 import com.example.trello.domain.activity.dto.CommentRequestDto;
 import com.example.trello.domain.activity.repository.ActivityRepository;
 import com.example.trello.domain.activity.entity.Activity;
@@ -15,6 +16,8 @@ import com.example.trello.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -105,6 +108,14 @@ public class ActivityService extends ActivityContents {
 
         activityRepository.delete(activity);
         return "comment가 삭제되었습니다.";
+    }
+
+    public List<ActivityResponseDto> getActivitiesFromCard(Long boardId, Long columnId, Long cardId) {
+        checkBoardById(boardId);
+        checkColumnsById(columnId);
+        Card card = checkCardById(cardId);
+
+        return activityRepository.findAllByCard(card).stream().map(ActivityResponseDto::new).toList();
     }
 
     private Board checkBoardById(Long boardId) {

@@ -57,4 +57,15 @@ public class ActivityController {
         ));
     }
 
+    @GetMapping
+    public ResponseEntity<ApiResponse> getActivitiesFromCard(
+            @PathVariable Long boardId,
+            @PathVariable Long columnId,
+            @PathVariable Long cardId
+    ) {
+        return ResponseEntity.ok(ApiResponse.ok(
+                activityService.getActivitiesFromCard(boardId,columnId,cardId)
+        ));
+    }
+
 }
