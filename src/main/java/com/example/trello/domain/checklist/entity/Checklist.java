@@ -1,9 +1,7 @@
 package com.example.trello.domain.checklist.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.trello.domain.card.entity.Card;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +16,9 @@ public class Checklist {
 	@GeneratedValue( strategy = GenerationType.IDENTITY )
 	private long id;
 	private String title;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Card card;
 
 	@Builder
 	public Checklist( String title ) {
