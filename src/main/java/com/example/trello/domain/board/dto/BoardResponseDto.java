@@ -10,8 +10,8 @@ public class BoardResponseDto {
 
     private String backImg;
 
-    public BoardResponseDto(Board board) {
+    public BoardResponseDto(Board board, String backImg) {
         this.title = board.getTitle();
-        this.backImg = board.getBackImg();
+        this.backImg = backImg;
     }
 }

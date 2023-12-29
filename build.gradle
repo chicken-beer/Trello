@@ -32,6 +32,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
+    //S3
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.232'
+
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'

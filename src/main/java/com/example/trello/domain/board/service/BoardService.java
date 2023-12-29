@@ -9,11 +9,13 @@ import com.example.trello.domain.boardUsers.repository.BoardUsersRepository;
 import com.example.trello.domain.user.entity.User;
 import com.example.trello.domain.user.repository.UserRepository;
 import com.example.trello.global.exception.CustomException;
+import com.example.trello.global.s3.S3Utils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -25,9 +27,13 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final BoardUsersRepository boardUsersRepository;
     private final UserRepository userRepository;
+    private final S3Utils s3Utils;
 
-    public String createBoard(BoardRequestDto boardRequestDto, User user) {
+    public String createBoard(BoardRequestDto boardRequestDto, User user){
+        String filename = s3Utils.uploadFile(boardRequestDto.getBackImg());
+        boardRequestDto.setFilename(filename);
         Board board = new Board(boardRequestDto,user);
+
         boardRepository.save(board);
         boardUsersRepository.save(BoardUsers
                 .builder()
@@ -36,7 +42,6 @@ public class BoardService {
                 .userRole("Admin")
                 .build()
         );
-
         return "보드 생성 성공";
     }
 
@@ -44,15 +49,16 @@ public class BoardService {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 ()-> new NoSuchElementException("보드를 찾을 수 없습니다.")
         );
-
-        return new BoardResponseDto(board);
+        String filename = board.getFilename();
+        String imageURL = s3Utils.getFileURL(filename);
+        return new BoardResponseDto(board,imageURL);
     }
 
     public List<BoardResponseDto> getBoardList(User user) {
         List<BoardUsers> boardusersList = boardUsersRepository.findAllByUserId(user.getId());
 
         return boardusersList.stream()
-                .map(boardUsers -> new BoardResponseDto(boardUsers.getBoard()))
+                .map(boardUsers -> new BoardResponseDto(boardUsers.getBoard(),boardUsers.getBoard().getFilename()))
                 .collect(Collectors.toList());
     }
 
@@ -74,6 +80,7 @@ public class BoardService {
         return "보드 수정 완료";
     }
 
+    @Transactional
     public String deleteBoard(Long boardId, User user) {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 ()-> new NoSuchElementException("보드를 찾을 수 없습니다.")
@@ -109,5 +116,36 @@ public class BoardService {
             );
         }
         return "초대가 완료되었습니다.";
+    }
+
+    public void responseInvite(Long boardId, String response, User user) {
+        BoardUsers boardUsers = boardUsersRepository.findByBoardIdAndUserId(boardId, user.getId());
+        if(boardUsers == null){
+            throw new CustomException(HttpStatus.CONFLICT,"보드가 삭제됐거나 초대가 취소되었습니다.");
+        }
+        if(boardUsers.getUserRole().equals("invitedMember")){
+            if(response.equals("Accept")){
+                boardUsers.updateUserRole("Member");
+            } else if(response.equals("Refuse")){
+                boardUsersRepository.delete(boardUsers);
+            } else{
+                throw new CustomException(HttpStatus.CONFLICT,"잘못된 응답입니다.");
+            }
+        } else{
+            throw new CustomException(HttpStatus.CONFLICT, "유효하지 않은 초대입니다.");
+        }
+    }
+
+    public void changeUserRole(Long boardId, Long userId, String userRole, User user) {
+        Board board = boardRepository.findById(boardId).orElseThrow(
+                ()-> new NoSuchElementException("존재하지 않는 보드입니다.")
+        );
+        if(!board.getCreator().equals(user.getLoginId())){
+            throw new CustomException(HttpStatus.CONFLICT, "권한이 없습니다.");
+        }
+
+        BoardUsers boardUsers = boardUsersRepository.findByBoardIdAndUserId(boardId,userId);
+        boardUsers.updateUserRole(userRole);
+
     }
 }
