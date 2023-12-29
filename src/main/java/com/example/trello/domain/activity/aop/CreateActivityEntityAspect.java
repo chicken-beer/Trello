@@ -1,7 +1,7 @@
 package com.example.trello.domain.activity.aop;
 
 
-import com.example.trello.domain.activity.ActivityService;
+import com.example.trello.domain.activity.service.ActivityService;
 import com.example.trello.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.AfterReturning;

@@ -1,5 +1,6 @@
-package com.example.trello.domain.activity;
+package com.example.trello.domain.activity.entity;
 
+import com.example.trello.domain.activity.dto.CommentRequestDto;
 import com.example.trello.domain.card.entity.Card;
 import com.example.trello.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -36,5 +37,15 @@ public class Activity {
         this.isComment = false;
         this.card = card;
         this.user = addingUser;
+    }
+
+
+    public Activity(CommentRequestDto requestDto, Card card, User user) {
+        this.contents = requestDto.getComment();
+        this.createdDate = LocalDateTime.now();
+        this.isComment = true;
+        this.card = card;
+        this.user = user;
+
     }
 }
