@@ -10,5 +10,6 @@ import java.util.List;
 public class ChecklistResponseDto {
 	private long id;
 	private String title;
+	private long card_id;
 	private List< ChecklistItemResponseDto > items;
 }
