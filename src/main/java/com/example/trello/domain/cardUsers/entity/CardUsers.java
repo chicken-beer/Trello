@@ -11,30 +11,28 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CardUsers {
 
-    @EmbeddedId
-    private CardUsersPK cardUsersPK;
+    @Id
+    @Column(name = "card_user_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "card_id")
-    @MapsId("cardId")
     private Card card;
 
     @ManyToOne
     @JoinColumn(name = "adding_user_id")
-    @MapsId("addingUserId")
     private User addingUser;
 
     @ManyToOne
     @JoinColumn(name = "added_user_id")
-    @MapsId("addedUserId")
     private User addedUser;
 
 
-    public CardUsers(Card card, User user) {
+    public CardUsers(Card card, User addingUser, User addedUser) {
         this.card = card;
-        this.addedUser = user;
-        this.addingUser = user;
-        this.cardUsersPK = new CardUsersPK(card.getId(), user.getId(), user.getId());
+        this.addedUser = addingUser;
+        this.addingUser = addedUser;
     }
 }
 

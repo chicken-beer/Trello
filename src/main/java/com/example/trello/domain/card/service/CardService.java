@@ -8,6 +8,8 @@ import com.example.trello.domain.card.dto.CardResponseDto;
 import com.example.trello.domain.card.dto.CardTitleUpdateRequestDto;
 import com.example.trello.domain.card.entity.Card;
 import com.example.trello.domain.card.repository.CardRepository;
+import com.example.trello.domain.cardUsers.entity.CardUsers;
+import com.example.trello.domain.cardUsers.repository.CardUsersRepository;
 import com.example.trello.domain.column.entity.Columns;
 import com.example.trello.domain.column.repository.ColumnRepository;
 import com.example.trello.domain.user.entity.User;
@@ -30,6 +32,7 @@ public class CardService {
     private final BoardRepository boardRepository;
     private final ColumnRepository columnRepository;
     private final CardRepository cardRepository;
+    private final CardUsersRepository cardUsersRepository;
 
     public CommonResponseDto postCard(Long boardId, Long columnId, CardRequestDto requestDto, User user) {
         Board board = boardRepository.findById(boardId).orElseThrow(() ->
@@ -107,21 +110,37 @@ public class CardService {
         return new CommonResponseDto("카드 삭제 완료 ", HttpStatus.NO_CONTENT.value());
     }
 
-    @Transactional
-    public ResponseEntity<CommonResponseDto> toggleUserToCard(Long boardId, Long columnId, Long cardId, Long userId, User user1) {
+
+    public String addUserToCard(Long boardId, Long columnId, Long cardId, Long userId, User addingUser) {
         findBoardAndColumnByIds(boardId, columnId);
         Card card = cardRepository.findById(cardId).orElseThrow(() ->
                 new NoSuchElementException("해당 카드를 찾을 수 없습니다. ID: " + cardId));
-        User user = userRepository.findById(userId).orElseThrow(() ->
+        User addedUser = userRepository.findById(userId).orElseThrow(() ->
                 new NoSuchElementException("해당 유저를 찾을 수 없습니다. ID: " + userId));
 
-        if (card.getUsers().contains(user)) {
-            card.getUsers().remove(user);
-            return ResponseEntity.status(HttpStatus.OK).body(new CommonResponseDto("카드 유저 제거", HttpStatus.OK.value()));
-        } else {
-            card.getUsers().add(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponseDto("카드 유저 등록", HttpStatus.CREATED.value()));
+        if (cardUsersRepository.findByCardAndAddedUser(card, addedUser).isPresent()) {
+            throw new IllegalArgumentException("이미 카드의 멤버입니다.");
         }
+
+        CardUsers cardUsers = new CardUsers(card,addingUser,addedUser);
+        cardUsersRepository.save(cardUsers);
+
+        return addedUser.getUsername()+"를 카드에 추가했습니다.";
+    }
+
+    public String deleteUserFromCard(Long boardId, Long columnId, Long cardId, Long userId, User user) {
+        findBoardAndColumnByIds(boardId, columnId);
+        Card card = cardRepository.findById(cardId).orElseThrow(() ->
+                new NoSuchElementException("해당 카드를 찾을 수 없습니다. ID: " + cardId));
+        User addedUser = userRepository.findById(userId).orElseThrow(() ->
+                new NoSuchElementException("해당 유저를 찾을 수 없습니다. ID: " + userId));
+
+        CardUsers cardUsers = cardUsersRepository.findByCardAndAddedUser(card,addedUser)
+                .orElseThrow(()-> new IllegalArgumentException("카드의 멤버가 아닙니다."));
+
+        cardUsersRepository.delete(cardUsers);
+
+        return addedUser.getUsername()+"가 카드에서 삭제되었습니다";
     }
 
     @Transactional

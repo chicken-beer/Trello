@@ -10,7 +10,6 @@ import com.example.trello.global.response.CommonResponseDto;
 import com.example.trello.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +24,7 @@ public class CardController {
 
     // 카드 상세 보기
     @GetMapping("/{cardId}")
-    public ResponseEntity<CardResponseDto> getCard(
+    public ResponseEntity<ApiResponse> getCard(
             @PathVariable Long boardId,
             @PathVariable Long columnId,
             @PathVariable Long cardId,
@@ -33,12 +32,12 @@ public class CardController {
     ) {
         CardResponseDto responseDto = cardService.getCard(boardId, columnId, cardId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+        return ResponseEntity.ok( ApiResponse.ok(responseDto) );
     }
 
     // 카드 생성
     @PostMapping
-    public ResponseEntity<CommonResponseDto> postCard(
+    public ResponseEntity<ApiResponse> postCard(
             @PathVariable Long boardId,
             @PathVariable Long columnId,
             @Valid @RequestBody CardRequestDto requestDto,
@@ -46,12 +45,12 @@ public class CardController {
     ) {
         CommonResponseDto responseDto = cardService.postCard(boardId, columnId, requestDto, userDetails.getUser());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+        return ResponseEntity.ok( ApiResponse.ok(responseDto) );
     }
 
     // 카드 제목 수정
     @PatchMapping("/{cardId}/title")
-    public ResponseEntity<CommonResponseDto> updateCardTitle(
+    public ResponseEntity<ApiResponse> updateCardTitle(
             @PathVariable Long boardId,
             @PathVariable Long columnId,
             @PathVariable Long cardId,
@@ -60,24 +59,25 @@ public class CardController {
     ) {
         CommonResponseDto responseDto = cardService.updateCardTitle(boardId, columnId, cardId, requestDto, userDetails.getUser());
 
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+        return ResponseEntity.ok( ApiResponse.ok(responseDto) );
     }
 
     // 카드 종료 기한 설정
     @PatchMapping("/{cardId}/duedate")
-    public ResponseEntity<CommonResponseDto> updateDueDate(
+    public ResponseEntity<ApiResponse> updateDueDate(
             @PathVariable Long boardId,
             @PathVariable Long columnId,
             @PathVariable Long cardId,
             @RequestBody CardDueDateUpdateRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        return cardService.updateDueDate(boardId, columnId, cardId, requestDto, userDetails.getUser());
+        return ResponseEntity.ok( ApiResponse.ok(cardService.updateDueDate(boardId, columnId, cardId, requestDto, userDetails.getUser())) );
+
     }
 
     // 카드 삭제
     @DeleteMapping("/{cardId}")
-    public ResponseEntity<CommonResponseDto> deleteCard(
+    public ResponseEntity<ApiResponse> deleteCard(
             @PathVariable Long boardId,
             @PathVariable Long columnId,
             @PathVariable Long cardId,
@@ -85,12 +85,12 @@ public class CardController {
     ) {
         CommonResponseDto responseDto = cardService.deleteCard(boardId, columnId, cardId, userDetails.getUser());
 
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+        return ResponseEntity.ok( ApiResponse.ok(responseDto) );
     }
 
     // 카드 숨기기
     @PatchMapping("/{cardId}/archive")
-    public ResponseEntity<CommonResponseDto> toggleIsArchived(
+    public ResponseEntity<ApiResponse> toggleIsArchived(
             @PathVariable Long boardId,
             @PathVariable Long columnId,
             @PathVariable Long cardId,
@@ -98,19 +98,31 @@ public class CardController {
     ) {
         CommonResponseDto responseDto = cardService.toggleIsArchived(boardId, columnId, cardId, userDetails.getUser());
 
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+        return ResponseEntity.ok( ApiResponse.ok(responseDto) );
     }
 
     // 카드에 멤버 추가
     @PostMapping("/{cardId}/users/{userId}")
-    public ResponseEntity<CommonResponseDto> addUserToCard(
+    public ResponseEntity<ApiResponse> addUserToCard(
             @PathVariable Long boardId,
             @PathVariable Long columnId,
             @PathVariable Long cardId,
             @PathVariable Long userId,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        return cardService.toggleUserToCard(boardId, columnId, cardId, userId, userDetails.getUser());
+        return ResponseEntity.ok( ApiResponse.ok(cardService.addUserToCard(boardId, columnId, cardId, userId, userDetails.getUser()) ));
+    }
+
+    // 카드에 멤버 삭제
+    @DeleteMapping("/{cardId}/users/{userId}")
+    public ResponseEntity<ApiResponse> deleteUserFromCard(
+            @PathVariable Long boardId,
+            @PathVariable Long columnId,
+            @PathVariable Long cardId,
+            @PathVariable Long userId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        return ResponseEntity.ok( ApiResponse.ok(cardService.deleteUserFromCard(boardId, columnId, cardId, userId, userDetails.getUser()) ));
     }
 
     // 카드 순서 변경
