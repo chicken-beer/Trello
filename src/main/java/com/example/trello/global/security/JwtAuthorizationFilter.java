@@ -1,7 +1,6 @@
 package com.example.trello.global.security;
 
 import com.example.trello.global.jwt.JwtUtil;
-import com.example.trello.global.redis.RedisRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,7 +24,6 @@ import java.util.Arrays;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final RedisRepository redisRepository;
     private final UserDetailsServiceImpl userDetailsService;
     private String[] whileList = {"/v1/auth/signup", "/v1/auth/login", "/v1/auth/reissue"};
 
