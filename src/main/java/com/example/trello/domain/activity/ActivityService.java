@@ -18,13 +18,29 @@ public class ActivityService extends ActivityComments {
 
 
     public void makeActivityByAddUser(Long cardId, Long userId, UserDetailsImpl userDetails) {
-        Card card = cardRepository.findById(cardId).orElseThrow(() -> new IllegalArgumentException("aop, search by cardId. 없을리가 없습니다."));
-        User addedUser = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("aop, search by userId. 없을리가 없습니다."));
+        Card card = cardRepository.findById(cardId).orElseThrow(
+                () -> new IllegalArgumentException("aop, search by cardId. 없을리가 없습니다."));
+        User addedUser = userRepository.findById(userId).orElseThrow(
+                () -> new IllegalArgumentException("aop, search by userId. 없을리가 없습니다."));
         User addingUser = userDetails.getUser();
 
-        String contents = AddUser(addingUser.getUsername(),addedUser.getUsername());
+        String contents = ADDUSER(addingUser.getUsername(),addedUser.getUsername());
 
         Activity activity = new Activity(contents, card, addingUser);
+
+        activityRepository.save(activity);
+    }
+
+    public void makeActivityByDeleteUser(Long cardId, Long userId, UserDetailsImpl userDetails) {
+        Card card = cardRepository.findById(cardId).orElseThrow(
+                () -> new IllegalArgumentException("aop, search by cardId. 없을리가 없습니다."));
+        User deletedUser = userRepository.findById(userId).orElseThrow(
+                () -> new IllegalArgumentException("aop, search by userId. 없을리가 없습니다."));
+        User deletingUser = userDetails.getUser();
+
+        String contents = DELETEUSER(deletingUser.getUsername(),deletedUser.getUsername());
+
+        Activity activity = new Activity(contents, card, deletingUser);
 
         activityRepository.save(activity);
     }

@@ -18,10 +18,18 @@ public class CreateActivityEntityAspect {
     private final ActivityService activityService;
 
     @Pointcut("execution(public * com.example.trello.domain.card.controller.CardController.addUserToCard(..)) && args(.., cardId, userId, userDetails)")
-    public void getaddUserToCardExecution(Long cardId, Long userId, UserDetailsImpl userDetails) {}
+    public void getAddUserToCardExecution(Long cardId, Long userId, UserDetailsImpl userDetails) {}
 
-    @AfterReturning("getaddUserToCardExecution(cardId, userId, userDetails)")
-    public void makeActivityExecution(Long cardId, Long userId, UserDetailsImpl userDetails) {
+    @Pointcut("execution(public * com.example.trello.domain.card.controller.CardController.deleteUserFromCard(..)) && args(.., cardId, userId, userDetails)")
+    public void getDeleteUserFromCardExecution(Long cardId, Long userId, UserDetailsImpl userDetails) {}
+
+    @AfterReturning("getAddUserToCardExecution(cardId, userId, userDetails)")
+    public void addUserToCardActivityExecution(Long cardId, Long userId, UserDetailsImpl userDetails) {
         activityService.makeActivityByAddUser(cardId, userId, userDetails);
+    }
+
+    @AfterReturning("getDeleteUserFromCardExecution(cardId, userId, userDetails)")
+    public void deleteUserFromCardActivityExecution(Long cardId, Long userId, UserDetailsImpl userDetails) {
+        activityService.makeActivityByDeleteUser(cardId, userId, userDetails);
     }
 }
