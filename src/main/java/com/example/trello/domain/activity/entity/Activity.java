@@ -48,4 +48,8 @@ public class Activity {
         this.user = user;
 
     }
+
+    public void update(CommentRequestDto requestDto) {
+        this.contents = requestDto.getComment();
+    }
 }

@@ -3,15 +3,18 @@ package com.example.trello.domain.activity.service;
 import com.example.trello.domain.activity.dto.CommentRequestDto;
 import com.example.trello.domain.activity.repository.ActivityRepository;
 import com.example.trello.domain.activity.entity.Activity;
+import com.example.trello.domain.board.entity.Board;
 import com.example.trello.domain.board.repository.BoardRepository;
 import com.example.trello.domain.card.entity.Card;
 import com.example.trello.domain.card.repository.CardRepository;
+import com.example.trello.domain.column.entity.Columns;
 import com.example.trello.domain.column.repository.ColumnRepository;
 import com.example.trello.domain.user.entity.User;
 import com.example.trello.domain.user.repository.UserRepository;
 import com.example.trello.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,10 +28,9 @@ public class ActivityService extends ActivityContents {
 
 
     public void makeActivityByAddUser(Long cardId, Long userId, UserDetailsImpl userDetails) {
-        Card card = cardRepository.findById(cardId).orElseThrow(
-                () -> new IllegalArgumentException("aop, search by cardId. 없을리가 없습니다."));
-        User addedUser = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalArgumentException("aop, search by userId. 없을리가 없습니다."));
+        Card card = checkCardById(cardId);
+
+        User addedUser = checkUserId(userId);
         User addingUser = userDetails.getUser();
 
         String contents = "";
@@ -44,10 +46,9 @@ public class ActivityService extends ActivityContents {
     }
 
     public void makeActivityByDeleteUser(Long cardId, Long userId, UserDetailsImpl userDetails) {
-        Card card = cardRepository.findById(cardId).orElseThrow(
-                () -> new IllegalArgumentException("aop, search by cardId. 없을리가 없습니다."));
-        User deletedUser = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalArgumentException("aop, search by userId. 없을리가 없습니다."));
+        Card card = checkCardById(cardId);
+
+        User deletedUser = checkUserId(userId);
         User deletingUser = userDetails.getUser();
 
         String contents = "";
@@ -63,17 +64,56 @@ public class ActivityService extends ActivityContents {
     }
 
     public String postComment(CommentRequestDto requestDto, Long boardId, Long columnId, Long cardId, UserDetailsImpl userDetails) {
-        boardRepository.findById(boardId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 board입니다."));
-        columnRepository.findById(columnId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 column입니다."));
-        Card card = cardRepository.findById(cardId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 card입니다."));
+        checkBoardById(boardId);
+        checkColumnsById(columnId);
+        Card card = checkCardById(cardId);
         User user = userDetails.getUser();
 
         Activity activity = new Activity(requestDto, card, user);
         activityRepository.save(activity);
 
         return "comment가 추가되었습니다.";
+    }
+
+    @Transactional
+    public String updateComment(CommentRequestDto requestDto, Long boardId, Long columnId, Long cardId, Long activityId, UserDetailsImpl userDetails) {
+        checkBoardById(boardId);
+        checkColumnsById(columnId);
+        checkCardById(cardId);
+        Activity activity = checkActivityId(activityId);
+
+        User user = userDetails.getUser();
+        if (!user.getUsername().equals(activity.getUser().getUsername())) {
+            throw new IllegalArgumentException("작성자만 수정 할 수 있습니다.");
+        }
+
+        activity.update(requestDto);
+
+        return "comment가 수정되었습니다.";
+    }
+
+    private Board checkBoardById(Long boardId) {
+        return boardRepository.findById(boardId).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 board입니다."));
+    }
+
+    private Columns checkColumnsById(Long columnsId) {
+        return columnRepository.findById(columnsId).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 column입니다."));
+    }
+
+    private Card checkCardById(Long cardId) {
+        return cardRepository.findById(cardId).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 card입니다."));
+    }
+
+    private User checkUserId(Long userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new IllegalArgumentException("aop, search by userId. 없을리가 없습니다."));
+    }
+
+    private Activity checkActivityId(Long activityId) {
+        return activityRepository.findById(activityId).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 activity입니다."));
     }
 }

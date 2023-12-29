@@ -30,4 +30,18 @@ public class ActivityController {
         ));
     }
 
+    @PatchMapping("{activityId}")
+    public ResponseEntity<ApiResponse> updateComment(
+            @RequestBody CommentRequestDto requestDto,
+            @PathVariable Long boardId,
+            @PathVariable Long columnId,
+            @PathVariable Long cardId,
+            @PathVariable Long activityId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        return ResponseEntity.ok(ApiResponse.ok(
+                activityService.updateComment(requestDto,boardId,columnId,cardId,activityId,userDetails)
+        ));
+    }
+
 }
