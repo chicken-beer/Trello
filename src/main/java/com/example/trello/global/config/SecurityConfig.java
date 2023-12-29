@@ -2,6 +2,7 @@ package com.example.trello.global.config;
 
 import com.example.trello.global.jwt.JwtUtil;
 import com.example.trello.global.redis.RedisRepository;
+import com.example.trello.global.security.JwtAuthenticationEntryPoint;
 import com.example.trello.global.security.JwtAuthenticationFilter;
 import com.example.trello.global.security.JwtAuthorizationFilter;
 import com.example.trello.global.security.UserDetailsServiceImpl;
@@ -30,7 +31,7 @@ public class SecurityConfig {
     private final RedisRepository redisRepository;
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
-
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -66,6 +67,9 @@ public class SecurityConfig {
 
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        http.exceptionHandling(handler -> handler.authenticationEntryPoint(jwtAuthenticationEntryPoint));
+
 
         return http.build();
     }
