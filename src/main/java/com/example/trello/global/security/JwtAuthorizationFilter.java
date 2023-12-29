@@ -1,9 +1,7 @@
 package com.example.trello.global.security;
 
 import com.example.trello.global.jwt.JwtUtil;
-import com.example.trello.global.redis.RedisRepository;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,32 +17,23 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Slf4j(topic = "인가")
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final RedisRepository redisRepository;
     private final UserDetailsServiceImpl userDetailsService;
+    private String[] whileList = {"/v1/auth/signup", "/v1/auth/login", "/v1/auth/reissue"};
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String accessToken = jwtUtil.resolveToken(request, JwtUtil.ACCESS_TOKEN_HEADER);
         if(StringUtils.hasText(accessToken)) {
-            try {
-                Claims info = jwtUtil.getUserInfoFromToken(accessToken);
-                setAuthentication(info.getSubject());
-            } catch (ExpiredJwtException e) {
-                if (redisRepository.hasRefreshToken(accessToken)) {
-                    String refreshToken = redisRepository.getRefreshToken(accessToken);
-                    String loginId = jwtUtil.getUserInfoFromToken(refreshToken).getSubject();
-                    String newToken = jwtUtil.createAccessToken(loginId);
-                    response.setHeader(JwtUtil.ACCESS_TOKEN_HEADER, newToken);
-                    setAuthentication(loginId);
-                }
-            }
+            Claims info = jwtUtil.getUserInfoFromToken(accessToken);
+            setAuthentication(info.getSubject());
         }
         filterChain.doFilter(request, response);
     }
@@ -52,12 +41,17 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         Authentication authentication = createAuthentication(loginId);
         context.setAuthentication(authentication);
-
         SecurityContextHolder.setContext(context);
     }
 
     private Authentication createAuthentication(String loginId) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginId);
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return Arrays.stream(whileList).anyMatch(path::equals);
     }
 }

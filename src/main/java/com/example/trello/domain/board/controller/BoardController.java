@@ -4,6 +4,7 @@ import com.example.trello.domain.board.dto.BoardRequestDto;
 import com.example.trello.domain.board.service.BoardService;
 import com.example.trello.global.response.ApiResponse;
 import com.example.trello.global.security.UserDetailsImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,7 +18,7 @@ public class BoardController {
     private final BoardService boardService;
 
     @PostMapping("")
-    public ResponseEntity<ApiResponse> createBoard(@RequestBody BoardRequestDto boardRequestDto,
+    public ResponseEntity<ApiResponse> createBoard(@Valid @ModelAttribute BoardRequestDto boardRequestDto,
                                                    @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(ApiResponse.ok(boardService.createBoard(boardRequestDto,userDetails.getUser())));
     }
@@ -34,7 +35,7 @@ public class BoardController {
 
     @PatchMapping("/{boardId}")
     public ResponseEntity<ApiResponse> updateBoard(@PathVariable Long boardId,
-                                                   @RequestBody BoardRequestDto boardRequestDto,
+                                                   @Valid @ModelAttribute BoardRequestDto boardRequestDto,
                                                    @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(ApiResponse.ok(boardService.updateBoard(boardId,boardRequestDto,userDetails.getUser())));
     }
@@ -51,4 +52,23 @@ public class BoardController {
                                                   @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(ApiResponse.ok(boardService.inviteUser(boardId, usernameList,userDetails.getUser())));
     }
+
+    @PatchMapping("/{boardId}/response")
+    public ResponseEntity<ApiResponse> responseInvite(@PathVariable Long boardId,
+                                                      @RequestParam("response") String response,
+                                                      @AuthenticationPrincipal UserDetailsImpl userDetails){
+
+        boardService.responseInvite(boardId,response,userDetails.getUser());
+        return ResponseEntity.ok(ApiResponse.ok("초대 응답 완료"));
+    }
+
+    @PatchMapping("/{boardId}/users/{userId}")
+    public ResponseEntity<ApiResponse> changeRole(@PathVariable Long boardId,
+                                                  @PathVariable Long userId,
+                                                  @RequestParam("role") String userRole,
+                                                  @AuthenticationPrincipal UserDetailsImpl userDetails){
+        boardService.changeUserRole(boardId,userId,userRole,userDetails.getUser());
+        return ResponseEntity.ok(ApiResponse.ok("권한 변경 성공"));
+    }
+
 }

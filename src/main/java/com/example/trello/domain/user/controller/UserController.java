@@ -4,8 +4,10 @@ import com.example.trello.domain.user.dto.UserPasswordDto;
 import com.example.trello.domain.user.dto.UserProfileDto;
 import com.example.trello.domain.user.dto.UserSignupDto;
 import com.example.trello.domain.user.service.UserService;
+import com.example.trello.global.jwt.JwtUtil;
 import com.example.trello.global.response.ApiResponse;
 import com.example.trello.global.security.UserDetailsImpl;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,10 +30,15 @@ public class UserController {
     @PostMapping("/users/logout")
     public ResponseEntity<ApiResponse> logout(@RequestHeader("Authorization") String token) {
         userService.logout(token);
-
-        return ResponseEntity.ok( ApiResponse.ok("로그아웃에 성공하였습니다.") );
+        return ResponseEntity.ok( ApiResponse.ok("로그아웃에 성공하셨습니다.") );
     }
 
+    @PostMapping("/auth/reissue")
+    public ResponseEntity<ApiResponse> reissue(@RequestHeader(name = "Authorization", required = false) String token, HttpServletResponse response) {
+        response.setHeader(JwtUtil.ACCESS_TOKEN_HEADER, userService.reissue(token));
+        return ResponseEntity.ok( ApiResponse.ok("토큰 재발급에 성공하셨습니다.") );
+    }
+    
     @GetMapping("/users")
     public ResponseEntity<ApiResponse> getProfile(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok( ApiResponse.ok(userService.getProfile(userDetails)) );

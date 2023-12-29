@@ -39,6 +39,7 @@ public class ChecklistService {
 	public List< ChecklistResponseDto > get_checklist() {
 		return checklistRepository.findAll().stream().map( list -> ChecklistResponseDto.builder()
 				.title( list.getTitle() )
+				.card_id( list.getCard().getId() )
 				.items(
 						checklistItemRepository.findAllByChecklistId( list.getId() )
 								.stream().map( item -> ChecklistItemResponseDto.builder()
