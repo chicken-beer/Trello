@@ -24,7 +24,12 @@ public class ActivityService extends ActivityComments {
                 () -> new IllegalArgumentException("aop, search by userId. 없을리가 없습니다."));
         User addingUser = userDetails.getUser();
 
-        String contents = ADDUSER(addingUser.getUsername(),addedUser.getUsername());
+        String contents = "";
+        if (addingUser.equals(addedUser)) {
+            contents = ADDSELF(addedUser.getUsername());
+        } else {
+            contents = ADDUSER(addingUser.getUsername(), addedUser.getUsername());
+        }
 
         Activity activity = new Activity(contents, card, addingUser);
 
@@ -38,7 +43,12 @@ public class ActivityService extends ActivityComments {
                 () -> new IllegalArgumentException("aop, search by userId. 없을리가 없습니다."));
         User deletingUser = userDetails.getUser();
 
-        String contents = DELETEUSER(deletingUser.getUsername(),deletedUser.getUsername());
+        String contents = "";
+        if (deletingUser.equals(deletedUser)) {
+            contents = DELETESELF(deletedUser.getUsername());
+        } else {
+            contents = DELETEUSER(deletingUser.getUsername(), deletedUser.getUsername());
+        }
 
         Activity activity = new Activity(contents, card, deletingUser);
 

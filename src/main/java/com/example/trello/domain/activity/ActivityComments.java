@@ -3,10 +3,18 @@ package com.example.trello.domain.activity;
 public class ActivityComments {
 
     public String ADDUSER(String addingUser, String addedUser) {
-        return addingUser+"가 "+addedUser+"를 멤버에 추가했습니다.";
+        return addingUser+" added "+addedUser+" to this card";
+    }
+
+    public String ADDSELF(String addedUser) {
+        return addedUser+"Joined Card";
     }
 
     public String DELETEUSER(String addingUser, String addedUser) {
-        return addingUser+"가 "+addedUser+"를 멤버에서 삭제했습니다.";
+        return addingUser+" removed "+addedUser+" from this card";
+    }
+
+    public String DELETESELF(String addedUser) {
+        return addedUser+" left this card";
     }
 }
