@@ -15,6 +15,7 @@ import com.example.trello.domain.column.repository.ColumnRepository;
 import com.example.trello.domain.user.entity.User;
 import com.example.trello.domain.user.repository.UserRepository;
 import com.example.trello.global.response.CommonResponseDto;
+import com.example.trello.global.s3.S3Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,7 @@ public class CardService {
     private final ColumnRepository columnRepository;
     private final CardRepository cardRepository;
     private final CardUsersRepository cardUsersRepository;
+    private final S3Utils s3Utils;
 
     public CommonResponseDto postCard(Long boardId, Long columnId, CardRequestDto requestDto, User user) {
         Board board = boardRepository.findById(boardId).orElseThrow(() ->
@@ -45,7 +47,8 @@ public class CardService {
             lastCardOrderInColumns=0;
         }
 
-        Card card = new Card(requestDto, columns, lastCardOrderInColumns);
+        String filename = s3Utils.uploadFile(requestDto.getFile());
+        Card card = new Card(requestDto, columns, lastCardOrderInColumns, filename);
         cardRepository.save(card);
 
         return new CommonResponseDto("카드 생성 성공", HttpStatus.CREATED.value());
@@ -105,6 +108,8 @@ public class CardService {
         Card card = cardRepository.findById(cardId).orElseThrow(() ->
                 new NoSuchElementException("해당 카드를 찾을 수 없습니다. ID: " + cardId));
 
+        String filename = card.getFilename();
+        s3Utils.deleteFile(filename);
         cardRepository.delete(card);
 
         return new CommonResponseDto("카드 삭제 완료 ", HttpStatus.NO_CONTENT.value());
