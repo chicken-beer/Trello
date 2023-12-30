@@ -10,6 +10,11 @@ public class BoardResponseDto {
 
     private String backImg;
 
+
+    public BoardResponseDto(Board board) {
+        this.title = board.getTitle();
+        this.backImg = null;
+    }
     public BoardResponseDto(Board board, String backImg) {
         this.title = board.getTitle();
         this.backImg = backImg;

@@ -26,14 +26,16 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final BoardUsersRepository boardUsersRepository;
-    private final UserRepository userRepository;
     private final S3Utils s3Utils;
 
     public String createBoard(BoardRequestDto boardRequestDto, User user){
-        String filename = s3Utils.uploadFile(boardRequestDto.getBackImg());
-        boardRequestDto.setFilename(filename);
-        Board board = new Board(boardRequestDto,user);
-
+        Board board;
+        if(boardRequestDto.getBackImg() != null){
+            String filename = s3Utils.uploadFile(boardRequestDto.getBackImg());
+            board = new Board(boardRequestDto,user,filename);
+        } else{
+            board = new Board(boardRequestDto,user);
+        }
         boardRepository.save(board);
         boardUsersRepository.save(BoardUsers
                 .builder()
@@ -49,9 +51,14 @@ public class BoardService {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 ()-> new NoSuchElementException("보드를 찾을 수 없습니다.")
         );
-        String filename = board.getFilename();
-        String imageURL = s3Utils.getFileURL(filename);
-        return new BoardResponseDto(board,imageURL);
+        if(board.getFilename() != null){
+            String filename = board.getFilename();
+            String imageURL = s3Utils.getFileURL(filename);
+
+            return new BoardResponseDto(board,imageURL);
+        } else{
+            return new BoardResponseDto(board);
+        }
     }
 
     public List<BoardResponseDto> getBoardList(User user) {
@@ -62,7 +69,6 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
 
-    //TODO 유저정보 받아서 일치하는지 확인하기 (update, delete)
     @Transactional
     public String updateBoard(Long boardId, BoardRequestDto boardRequestDto,User user) {
         Board board = boardRepository.findById(boardId).orElseThrow(
@@ -75,8 +81,16 @@ public class BoardService {
         if(!boardUsers.getUserRole().equals("Admin")){
             throw new CustomException(HttpStatus.CONFLICT,"권한이 없습니다.");
         }
-
-        board.update(boardRequestDto);
+        if(boardRequestDto.getBackImg() != null){
+            if(board.getFilename() != null){
+                String filename = board.getFilename();
+                s3Utils.deleteFile(filename);
+            }
+            String newFilename = s3Utils.uploadFile(boardRequestDto.getBackImg());
+            board.update(boardRequestDto, newFilename);
+        } else{
+            board.update(boardRequestDto);
+        }
         return "보드 수정 완료";
     }
 
@@ -90,62 +104,10 @@ public class BoardService {
             throw new CustomException(HttpStatus.CONFLICT,"권한이 없습니다.");
         }
 
+        String filename = board.getFilename();
+        s3Utils.deleteFile(filename);
         boardRepository.delete(board);
+
         return "게시물 삭제 완료";
-    }
-
-    public String inviteUser(Long boardId, String[] usernameList, User user) {
-        Board board = boardRepository.findById(boardId).orElseThrow(
-                ()-> new NoSuchElementException("보드를 찾을 수 없습니다.")
-        );
-        if(boardUsersRepository.findByUserId((user.getId())).isEmpty()){
-            throw new CustomException(HttpStatus.CONFLICT, "권한이 없습니다.");
-        } else if(!boardUsersRepository.findByBoardIdAndUserId(boardId,user.getId()).getUserRole().equals("Admin")){
-            throw new CustomException(HttpStatus.CONFLICT,"권한이 없습니다.");
-        }
-
-        for(int i=0; i< usernameList.length; i++){
-            User invitedUser = userRepository.findByUsername(usernameList[i]).orElseThrow(
-                    ()-> new NoSuchElementException("사용자를 찾을 수 없습니다.")
-            );
-            boardUsersRepository.save(BoardUsers.builder()
-                    .board(board)
-                    .user(invitedUser)
-                    .userRole("invitedMember")
-                    .build()
-            );
-        }
-        return "초대가 완료되었습니다.";
-    }
-
-    public void responseInvite(Long boardId, String response, User user) {
-        BoardUsers boardUsers = boardUsersRepository.findByBoardIdAndUserId(boardId, user.getId());
-        if(boardUsers == null){
-            throw new CustomException(HttpStatus.CONFLICT,"보드가 삭제됐거나 초대가 취소되었습니다.");
-        }
-        if(boardUsers.getUserRole().equals("invitedMember")){
-            if(response.equals("Accept")){
-                boardUsers.updateUserRole("Member");
-            } else if(response.equals("Refuse")){
-                boardUsersRepository.delete(boardUsers);
-            } else{
-                throw new CustomException(HttpStatus.CONFLICT,"잘못된 응답입니다.");
-            }
-        } else{
-            throw new CustomException(HttpStatus.CONFLICT, "유효하지 않은 초대입니다.");
-        }
-    }
-
-    public void changeUserRole(Long boardId, Long userId, String userRole, User user) {
-        Board board = boardRepository.findById(boardId).orElseThrow(
-                ()-> new NoSuchElementException("존재하지 않는 보드입니다.")
-        );
-        if(!board.getCreator().equals(user.getLoginId())){
-            throw new CustomException(HttpStatus.CONFLICT, "권한이 없습니다.");
-        }
-
-        BoardUsers boardUsers = boardUsersRepository.findByBoardIdAndUserId(boardId,userId);
-        boardUsers.updateUserRole(userRole);
-
     }
 }

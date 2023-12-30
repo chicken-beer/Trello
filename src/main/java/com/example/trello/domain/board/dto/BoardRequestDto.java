@@ -15,8 +15,6 @@ public class BoardRequestDto {
 
     private MultipartFile backImg;
 
-    private String filename;
-
     @Size(max = 100 ,message = "100자 이내로 작성해주세요.")
     private String description;
 
