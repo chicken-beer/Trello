@@ -16,16 +16,26 @@ public class CardResponseDto {
     private final String title;
     private final String description;
     private final String coverImg;
-    private final String filename;
+    private final String fileURL;
     private final LocalDateTime dueDate;
     private final Boolean isArchived;
+
+    public CardResponseDto(Card card, String fileURL) {
+        this.id = card.getId();
+        this.title = card.getTitle();
+        this.description = card.getDescription();
+        this.coverImg = card.getCoverImg();
+        this.fileURL = fileURL;
+        this.dueDate = card.getDueDate();
+        this.isArchived = card.getIsArchived();
+    }
 
     public CardResponseDto(Card card) {
         this.id = card.getId();
         this.title = card.getTitle();
         this.description = card.getDescription();
         this.coverImg = card.getCoverImg();
-        this.filename = card.getFilename();
+        this.fileURL = null;
         this.dueDate = card.getDueDate();
         this.isArchived = card.getIsArchived();
     }

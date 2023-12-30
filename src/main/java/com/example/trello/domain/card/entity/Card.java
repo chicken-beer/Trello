@@ -70,4 +70,8 @@ public class Card {
         this.columns = columns;
         this.cardOrder = lastCardOrderInColumns+1;
     }
+
+    public void updateFilename(String newFilename) {
+        this.filename = newFilename;
+    }
 }
