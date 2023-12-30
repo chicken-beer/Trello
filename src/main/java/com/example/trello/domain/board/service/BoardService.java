@@ -29,10 +29,13 @@ public class BoardService {
     private final S3Utils s3Utils;
 
     public String createBoard(BoardRequestDto boardRequestDto, User user){
-        String filename = s3Utils.uploadFile(boardRequestDto.getBackImg());
-        boardRequestDto.setFilename(filename);
-        Board board = new Board(boardRequestDto,user);
-
+        Board board;
+        if(boardRequestDto.getBackImg() != null){
+            String filename = s3Utils.uploadFile(boardRequestDto.getBackImg());
+            board = new Board(boardRequestDto,user,filename);
+        } else{
+            board = new Board(boardRequestDto,user);
+        }
         boardRepository.save(board);
         boardUsersRepository.save(BoardUsers
                 .builder()
@@ -48,9 +51,14 @@ public class BoardService {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 ()-> new NoSuchElementException("보드를 찾을 수 없습니다.")
         );
-        String filename = board.getFilename();
-        String imageURL = s3Utils.getFileURL(filename);
-        return new BoardResponseDto(board,imageURL);
+        if(board.getFilename() != null){
+            String filename = board.getFilename();
+            String imageURL = s3Utils.getFileURL(filename);
+
+            return new BoardResponseDto(board,imageURL);
+        } else{
+            return new BoardResponseDto(board);
+        }
     }
 
     public List<BoardResponseDto> getBoardList(User user) {
@@ -61,7 +69,6 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
 
-    //TODO 유저정보 받아서 일치하는지 확인하기 (update, delete)
     @Transactional
     public String updateBoard(Long boardId, BoardRequestDto boardRequestDto,User user) {
         Board board = boardRepository.findById(boardId).orElseThrow(
@@ -74,12 +81,16 @@ public class BoardService {
         if(!boardUsers.getUserRole().equals("Admin")){
             throw new CustomException(HttpStatus.CONFLICT,"권한이 없습니다.");
         }
-        String filename = board.getFilename();
-        s3Utils.deleteFile(filename);
-
-        String newFilename = s3Utils.uploadFile(boardRequestDto.getBackImg());
-        boardRequestDto.setFilename(newFilename);
-        board.update(boardRequestDto);
+        if(boardRequestDto.getBackImg() != null){
+            if(board.getFilename() != null){
+                String filename = board.getFilename();
+                s3Utils.deleteFile(filename);
+            }
+            String newFilename = s3Utils.uploadFile(boardRequestDto.getBackImg());
+            board.update(boardRequestDto, newFilename);
+        } else{
+            board.update(boardRequestDto);
+        }
         return "보드 수정 완료";
     }
 
