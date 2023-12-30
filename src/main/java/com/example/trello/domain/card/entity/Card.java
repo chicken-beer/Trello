@@ -24,6 +24,7 @@ public class Card {
     private String title;
     private String description;
     private String coverImg;
+    private String filename;
     private LocalDateTime dueDate;
     private Boolean isArchived;
     private Integer cardOrder;
@@ -33,6 +34,16 @@ public class Card {
         this.title = requestDto.getTitle();
         this.description = requestDto.getDescription();
         this.coverImg = requestDto.getCoverImg();
+        this.isArchived = requestDto.getIsArchived();
+        this.columns = columns;
+        this.cardOrder = lastCardOrderInColumns+1;
+    }
+
+    public Card(CardRequestDto requestDto, Columns columns, Integer lastCardOrderInColumns, String filename) {
+        this.title = requestDto.getTitle();
+        this.description = requestDto.getDescription();
+        this.coverImg = requestDto.getCoverImg();
+        this.filename = filename;
         this.isArchived = requestDto.getIsArchived();
         this.columns = columns;
         this.cardOrder = lastCardOrderInColumns+1;

@@ -16,6 +16,7 @@ public class CardResponseDto {
     private final String title;
     private final String description;
     private final String coverImg;
+    private final String filename;
     private final LocalDateTime dueDate;
     private final Boolean isArchived;
 
@@ -24,6 +25,7 @@ public class CardResponseDto {
         this.title = card.getTitle();
         this.description = card.getDescription();
         this.coverImg = card.getCoverImg();
+        this.filename = card.getFilename();
         this.dueDate = card.getDueDate();
         this.isArchived = card.getIsArchived();
     }

@@ -3,6 +3,7 @@ package com.example.trello.domain.card.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -13,5 +14,6 @@ public class CardRequestDto {
     private String title;
     private String description;
     private String coverImg;
+    private MultipartFile file;
     private Boolean isArchived;
 }
