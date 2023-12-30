@@ -1,9 +1,6 @@
 package com.example.trello.domain.card.controller;
 
-import com.example.trello.domain.card.dto.CardDueDateUpdateRequestDto;
-import com.example.trello.domain.card.dto.CardRequestDto;
-import com.example.trello.domain.card.dto.CardResponseDto;
-import com.example.trello.domain.card.dto.CardTitleUpdateRequestDto;
+import com.example.trello.domain.card.dto.*;
 import com.example.trello.domain.card.service.CardService;
 import com.example.trello.global.response.ApiResponse;
 import com.example.trello.global.response.CommonResponseDto;
@@ -13,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 
@@ -40,7 +38,7 @@ public class CardController {
     public ResponseEntity<ApiResponse> postCard(
             @PathVariable Long boardId,
             @PathVariable Long columnId,
-            @Valid @RequestBody CardRequestDto requestDto,
+            @Valid @ModelAttribute CardRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         CommonResponseDto responseDto = cardService.postCard(boardId, columnId, requestDto, userDetails.getUser());
@@ -72,6 +70,17 @@ public class CardController {
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         return ResponseEntity.ok( ApiResponse.ok(cardService.updateDueDate(boardId, columnId, cardId, requestDto, userDetails.getUser())) );
+
+    }
+
+    @PatchMapping("/{cardId}/file")
+    public ResponseEntity<ApiResponse> updateFile(
+            @PathVariable Long boardId,
+            @PathVariable Long columnId,
+            @PathVariable Long cardId,
+            @ModelAttribute CardFileRequestDto cardFileRequestDto
+    ){
+        return ResponseEntity.ok(ApiResponse.ok(cardService.updateFile(boardId,columnId,cardId,cardFileRequestDto)));
 
     }
 

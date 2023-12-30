@@ -1,11 +1,9 @@
 package com.example.trello.domain.card.service;
 
+import com.example.trello.domain.board.dto.BoardResponseDto;
 import com.example.trello.domain.board.entity.Board;
 import com.example.trello.domain.board.repository.BoardRepository;
-import com.example.trello.domain.card.dto.CardDueDateUpdateRequestDto;
-import com.example.trello.domain.card.dto.CardRequestDto;
-import com.example.trello.domain.card.dto.CardResponseDto;
-import com.example.trello.domain.card.dto.CardTitleUpdateRequestDto;
+import com.example.trello.domain.card.dto.*;
 import com.example.trello.domain.card.entity.Card;
 import com.example.trello.domain.card.repository.CardRepository;
 import com.example.trello.domain.cardUsers.entity.CardUsers;
@@ -21,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.NoSuchElementException;
 
@@ -46,10 +45,15 @@ public class CardService {
         if (lastCardOrderInColumns==null) {
             lastCardOrderInColumns=0;
         }
-
-        String filename = s3Utils.uploadFile(requestDto.getFile());
-        Card card = new Card(requestDto, columns, lastCardOrderInColumns, filename);
+        Card card;
+        if(requestDto.getFile() != null){
+            String filename = s3Utils.uploadFile(requestDto.getFile());
+            card = new Card(requestDto, columns, lastCardOrderInColumns, filename);
+        } else{
+            card = new Card(requestDto, columns, lastCardOrderInColumns);
+        }
         cardRepository.save(card);
+
 
         return new CommonResponseDto("카드 생성 성공", HttpStatus.CREATED.value());
     }
@@ -59,7 +63,14 @@ public class CardService {
         Card card = cardRepository.findById(cardId).orElseThrow(() ->
                 new NoSuchElementException("해당 카드를 찾을 수 없습니다. ID: " + cardId));
 
-        return new CardResponseDto(card);
+        if(card.getFilename() != null){
+            String filename = card.getFilename();
+            String imageURL = s3Utils.getFileURL(filename);
+
+            return new CardResponseDto(card,imageURL);
+        } else{
+            return new CardResponseDto(card);
+        }
     }
 
     @Transactional
@@ -86,6 +97,31 @@ public class CardService {
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponseDto("종료 기한 수정", HttpStatus.OK.value()));
+    }
+
+    @Transactional
+    public CommonResponseDto updateFile(Long boardId, Long columnId, Long cardId, CardFileRequestDto cardFileRequestDto){
+        findBoardAndColumnByIds(boardId, columnId);
+        Card card = cardRepository.findById(cardId).orElseThrow(() ->
+                new NoSuchElementException("해당 카드를 찾을 수 없습니다. ID: " + cardId));
+
+        if(cardFileRequestDto.getFile() == null){
+            if(card.getFilename() != null) {
+                String filename = card.getFilename();
+                s3Utils.deleteFile(filename);
+                card.updateFilename(null);
+            }
+        } else{
+            if(card.getFilename() != null) {
+                String filename = card.getFilename();
+                s3Utils.deleteFile(filename);
+            }
+
+            String newFilename = s3Utils.uploadFile(cardFileRequestDto.getFile());
+            card.updateFilename(newFilename);
+        }
+
+        return new CommonResponseDto("파일 수정 성공", HttpStatus.OK.value());
     }
 
     @Transactional
