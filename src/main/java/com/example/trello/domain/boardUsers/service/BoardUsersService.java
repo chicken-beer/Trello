@@ -25,9 +25,8 @@ public class BoardUsersService {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 ()-> new NoSuchElementException("보드를 찾을 수 없습니다.")
         );
-        if(boardUsersRepository.findByUserId((user.getId())).isEmpty()){
-            throw new CustomException(HttpStatus.CONFLICT, "권한이 없습니다.");
-        } else if(!boardUsersRepository.findByBoardIdAndUserId(boardId,user.getId()).getUserRole().equals("Admin")){
+        if(!boardUsersRepository.findByBoardIdAndUserId(boardId,user.getId()).getUserRole().equals("Admin") ||
+                boardUsersRepository.findByBoardIdAndUserId(boardId, user.getId()) == null){
             throw new CustomException(HttpStatus.CONFLICT,"권한이 없습니다.");
         }
 
