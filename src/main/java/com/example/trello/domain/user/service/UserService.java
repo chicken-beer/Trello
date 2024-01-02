@@ -59,7 +59,11 @@ public class UserService {
             if (redisRepository.hasRefreshToken(key)) {
                 String refreshToken = redisRepository.getRefreshToken(key);
                 String loginId = jwtUtil.getUserInfoFromToken(refreshToken).getSubject();
-                return jwtUtil.createAccessToken(loginId);
+
+                redisRepository.deleteRefreshToken(key);
+                String newToken = jwtUtil.createAccessToken(loginId);
+                redisRepository.setRefreshToken(newToken.substring(7), refreshToken);
+                return newToken;
             }
         }
         throw new CustomException(HttpStatus.BAD_REQUEST, "토큰이 유효하지 않습니다.");
