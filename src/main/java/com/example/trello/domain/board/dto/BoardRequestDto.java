@@ -3,7 +3,6 @@ package com.example.trello.domain.board.dto;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter

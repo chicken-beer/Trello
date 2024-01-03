@@ -7,7 +7,6 @@ import com.example.trello.domain.board.repository.BoardRepository;
 import com.example.trello.domain.boardUsers.entity.BoardUsers;
 import com.example.trello.domain.boardUsers.repository.BoardUsersRepository;
 import com.example.trello.domain.user.entity.User;
-import com.example.trello.domain.user.repository.UserRepository;
 import com.example.trello.global.exception.CustomException;
 import com.example.trello.global.s3.S3Utils;
 import jakarta.transaction.Transactional;
@@ -15,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;

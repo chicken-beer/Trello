@@ -2,8 +2,8 @@ package com.example.trello.domain.activity.service;
 
 import com.example.trello.domain.activity.dto.ActivityResponseDto;
 import com.example.trello.domain.activity.dto.CommentRequestDto;
-import com.example.trello.domain.activity.repository.ActivityRepository;
 import com.example.trello.domain.activity.entity.Activity;
+import com.example.trello.domain.activity.repository.ActivityRepository;
 import com.example.trello.domain.board.entity.Board;
 import com.example.trello.domain.board.repository.BoardRepository;
 import com.example.trello.domain.card.entity.Card;

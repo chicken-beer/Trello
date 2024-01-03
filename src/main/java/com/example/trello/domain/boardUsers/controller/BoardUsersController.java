@@ -1,6 +1,5 @@
 package com.example.trello.domain.boardUsers.controller;
 
-import com.example.trello.domain.board.entity.Board;
 import com.example.trello.domain.boardUsers.service.BoardUsersService;
 import com.example.trello.global.response.ApiResponse;
 import com.example.trello.global.security.UserDetailsImpl;

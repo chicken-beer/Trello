@@ -2,7 +2,6 @@ package com.example.trello.domain.boardUsers.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.EmbeddedId;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 

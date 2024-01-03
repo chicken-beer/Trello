@@ -1,14 +1,11 @@
 package com.example.trello.domain.label.controller;
 
 import com.example.trello.domain.label.dto.LabelRequestDto;
-import com.example.trello.domain.label.dto.LabelResponseDto;
 import com.example.trello.domain.label.service.LabelService;
 import com.example.trello.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
